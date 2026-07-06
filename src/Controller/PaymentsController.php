@@ -64,11 +64,11 @@ class PaymentsController extends AppController
         if ($this->request->is('post')) {
             $payment = $this->Payments->patchEntity($payment, $this->request->getData());
             if ($this->Payments->save($payment)) {
-                $this->Flash->success(__('The payment has been saved.'));
+                $this->Notification->success(__('The payment has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The payment could not be saved. Please, try again.'));
+            $this->Notification->error(__('The payment could not be saved. Please, try again.'));
         }
         $orders = $this->Payments->Orders->find('list', limit: 200)->all();
         $this->set(compact('payment', 'orders'));
@@ -88,11 +88,11 @@ class PaymentsController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $payment = $this->Payments->patchEntity($payment, $this->request->getData());
             if ($this->Payments->save($payment)) {
-                $this->Flash->success(__('The payment has been saved.'));
+                $this->Notification->success(__('The payment has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The payment could not be saved. Please, try again.'));
+            $this->Notification->error(__('The payment could not be saved. Please, try again.'));
         }
         $orders = $this->Payments->Orders->find('list', limit: 200)->all();
         $this->set(compact('payment', 'orders'));
@@ -111,9 +111,9 @@ class PaymentsController extends AppController
         $payment = $this->Payments->get($id);
         $this->Authorization->authorize($payment);
         if ($this->Payments->delete($payment)) {
-            $this->Flash->success(__('The payment has been deleted.'));
+            $this->Notification->success(__('The payment has been deleted.'));
         } else {
-            $this->Flash->error(__('The payment could not be deleted. Please, try again.'));
+            $this->Notification->error(__('The payment could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

@@ -7,6 +7,13 @@ use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\Event\Event;
+use Cake\Event\EventInterface;
+use Cake\Event\EventManager;
+use Cake\Datasource\EntityInterface;
+use Cake\Log\Log;
+use App\Event\DomainEvents;
+use ArrayObject;
 
 /**
  * SentEmails Model
@@ -109,5 +116,34 @@ class SentEmailsTable extends Table
         $rules->add($rules->existsIn(['email_signature_id'], 'EmailSignatures'), ['errorField' => 'email_signature_id']);
 
         return $rules;
+    }
+
+    // =========================================================================
+    // PHASE 10: Model Events for SentEmails
+    // =========================================================================
+
+    /**
+     * Model.afterSave — Dispatch Email.sent after a sent_email record is saved.
+     *
+     * Whenever an email is logged in the sent_emails table, this fires
+     * the Email.sent event. The NotificationListener will log it and
+     * update analytics.
+     */
+    public function afterSave(EventInterface $event, EntityInterface $entity, ArrayObject $options): void
+    {
+        Log::info(sprintf(
+            '[PHASE 10] Model.afterSave — SentEmail to %s saved (subject: %s)',
+            $entity->recipient_email ?? 'unknown',
+            $entity->subject ?? 'N/A'
+        ));
+
+        // Dispatch Email.sent custom domain event
+        if ($entity->isNew()) {
+            EventManager::instance()->dispatch(new Event(
+                DomainEvents::EMAIL_SENT,
+                $this,
+                ['email' => $entity]
+            ));
+        }
     }
 }

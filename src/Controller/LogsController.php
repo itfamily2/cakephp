@@ -48,7 +48,7 @@ class LogsController extends AppController
         $filePath = $this->logPath . $fileName;
 
         if (!file_exists($filePath)) {
-            $this->Flash->error(__('Log file not found.'));
+            $this->Notification->error(__('Log file not found.'));
             return $this->redirect(['action' => 'index']);
         }
 
@@ -57,10 +57,10 @@ class LogsController extends AppController
         if ($this->request->is(['post', 'put'])) {
             $content = $this->request->getData('content');
             if ($file->write($content)) {
-                $this->Flash->success(__('Log file updated successfully.'));
+                $this->Notification->success(__('Log file updated successfully.'));
                 return $this->redirect(['action' => 'view', $fileName]);
             }
-            $this->Flash->error(__('Failed to update log file.'));
+            $this->Notification->error(__('Failed to update log file.'));
         }
 
         $content = $file->read();
@@ -78,7 +78,7 @@ class LogsController extends AppController
         $filePath = $this->logPath . $fileName;
 
         if (!file_exists($filePath)) {
-            $this->Flash->error(__('Log file not found.'));
+            $this->Notification->error(__('Log file not found.'));
             return $this->redirect(['action' => 'index']);
         }
 
@@ -86,9 +86,9 @@ class LogsController extends AppController
         $backupName = pathinfo($fileName, PATHINFO_FILENAME) . '_backup_' . date('Ymd_His') . '.log';
         
         if ($file->copy($this->logPath . $backupName)) {
-            $this->Flash->success(__('Backup created successfully as {0}.', $backupName));
+            $this->Notification->success(__('Backup created successfully as {0}.', $backupName));
         } else {
-            $this->Flash->error(__('Failed to create backup.'));
+            $this->Notification->error(__('Failed to create backup.'));
         }
 
         return $this->redirect(['action' => 'index']);
@@ -103,15 +103,15 @@ class LogsController extends AppController
         $filePath = $this->logPath . $fileName;
 
         if (!file_exists($filePath)) {
-            $this->Flash->error(__('Log file not found.'));
+            $this->Notification->error(__('Log file not found.'));
             return $this->redirect(['action' => 'index']);
         }
 
         $file = new File($filePath);
         if ($file->write('')) {
-            $this->Flash->success(__('Log file emptied successfully.'));
+            $this->Notification->success(__('Log file emptied successfully.'));
         } else {
-            $this->Flash->error(__('Failed to empty log file.'));
+            $this->Notification->error(__('Failed to empty log file.'));
         }
 
         return $this->redirect(['action' => 'index']);
@@ -127,15 +127,15 @@ class LogsController extends AppController
         $filePath = $this->logPath . $fileName;
 
         if (!file_exists($filePath)) {
-            $this->Flash->error(__('Log file not found.'));
+            $this->Notification->error(__('Log file not found.'));
             return $this->redirect(['action' => 'index']);
         }
 
         $file = new File($filePath);
         if ($file->delete()) {
-            $this->Flash->success(__('Log file deleted successfully.'));
+            $this->Notification->success(__('Log file deleted successfully.'));
         } else {
-            $this->Flash->error(__('Failed to delete log file.'));
+            $this->Notification->error(__('Failed to delete log file.'));
         }
 
         return $this->redirect(['action' => 'index']);

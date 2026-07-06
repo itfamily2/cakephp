@@ -85,11 +85,11 @@ class ActivityLogsController extends AppController
         if ($this->request->is('post')) {
             $activityLog = $this->ActivityLogs->patchEntity($activityLog, $this->request->getData());
             if ($this->ActivityLogs->save($activityLog)) {
-                $this->Flash->success(__('The activity log has been saved.'));
+                $this->Notification->success(__('The activity log has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The activity log could not be saved. Please, try again.'));
+            $this->Notification->error(__('The activity log could not be saved. Please, try again.'));
         }
         $users = $this->ActivityLogs->Users->find('list', limit: 200)->all();
         $this->set(compact('activityLog', 'users'));
@@ -109,11 +109,11 @@ class ActivityLogsController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $activityLog = $this->ActivityLogs->patchEntity($activityLog, $this->request->getData());
             if ($this->ActivityLogs->save($activityLog)) {
-                $this->Flash->success(__('The activity log has been saved.'));
+                $this->Notification->success(__('The activity log has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The activity log could not be saved. Please, try again.'));
+            $this->Notification->error(__('The activity log could not be saved. Please, try again.'));
         }
         $users = $this->ActivityLogs->Users->find('list', limit: 200)->all();
         $this->set(compact('activityLog', 'users'));
@@ -132,9 +132,9 @@ class ActivityLogsController extends AppController
         $activityLog = $this->ActivityLogs->get($id);
         $this->Authorization->authorize($activityLog);
         if ($this->ActivityLogs->delete($activityLog)) {
-            $this->Flash->success(__('The activity log has been deleted.'));
+            $this->Notification->success(__('The activity log has been deleted.'));
         } else {
-            $this->Flash->error(__('The activity log could not be deleted. Please, try again.'));
+            $this->Notification->error(__('The activity log could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

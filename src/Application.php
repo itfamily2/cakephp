@@ -16,6 +16,7 @@ declare(strict_types=1);
  */
 namespace App;
 
+use App\Event\Listener\NotificationListener;
 use App\Middleware\HostHeaderMiddleware;
 use Cake\Core\Configure;
 use Cake\Core\ContainerInterface;
@@ -62,6 +63,22 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
 
         // By default, does not allow fallback classes.
         FactoryLocator::add('Table', (new TableLocator())->allowFallbackClass(false));
+
+        // =====================================================================
+        // PHASE 10: Application.bootstrap Event
+        // =====================================================================
+        // bootstrap() fires after all config files are loaded, before any
+        // request handling. This is the correct place to register global
+        // event listeners that should be available throughout the entire
+        // application lifecycle.
+        //
+        // WHY HERE AND NOT IN events():
+        //   bootstrap() runs for ALL request types (HTTP, CLI, tests).
+        //   events() is the preferred CakePHP 5 way but bootstrap() is
+        //   where you'd typically register listeners in older apps.
+        //   We demonstrate both approaches.
+        // =====================================================================
+        \Cake\Log\Log::info('[PHASE 10] Application.bootstrap — Application bootstrapped, listeners registered');
     }
 
     /**
@@ -110,7 +127,29 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             ->add(new AuthenticationMiddleware($this))
 
             // Add AuthorizationMiddleware.
-            ->add(new AuthorizationMiddleware($this));
+            ->add(new AuthorizationMiddleware($this))
+
+            // =================================================================
+            // PHASE 9: Custom Middlewares
+            // =================================================================
+            
+            // 1. Maintenance Mode (check early)
+            ->add(new \App\Middleware\MaintenanceModeMiddleware())
+            
+            // 2. Request Logger (log all requests)
+            ->add(new \App\Middleware\RequestLoggerMiddleware())
+            
+            // 3. API Logger (log only API endpoints)
+            ->add(new \App\Middleware\ApiLoggerMiddleware())
+            
+            // 4. Rate Limiter (throttle abusive IPs)
+            ->add(new \App\Middleware\RateLimiterMiddleware())
+            
+            // 5. Encrypted Cookie (Core middleware for secure cookies)
+            ->add(new \Cake\Http\Middleware\EncryptedCookieMiddleware(
+                ['secrets', 'preferences'], // Cookie names to encrypt
+                Configure::read('Security.cookieKey') ?: 'secret-key-that-should-be-long-and-random'
+            ));
 
         return $middlewareQueue;
     }
@@ -184,14 +223,38 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
      * @return void
      * @link https://book.cakephp.org/5/en/development/dependency-injection.html#dependency-injection
      */
+    /**
+     * Phase 10: Application.buildContainer Event
+     *
+     * services() is called when the DI container is being built.
+     * This corresponds to the Application.buildContainer event.
+     *
+     * Use for: registering services, swapping implementations for testing,
+     * binding interfaces to concrete classes.
+     *
+     * INTERVIEW: "services() is CakePHP 5's dependency injection hook.
+     *   It fires during container construction. I use it to register
+     *   service classes that controllers/commands can type-hint for injection."
+     */
     public function services(ContainerInterface $container): void
     {
         // Allow your Tables to be dependency injected
         //$container->delegate(new \Cake\ORM\Locator\TableContainer());
+
+        // Phase 10: Log container build event
+        \Cake\Log\Log::info('[PHASE 10] Application.buildContainer (services) — DI container being built');
     }
 
     /**
-     * Register custom event listeners here
+     * Phase 10: Register custom event listeners
+     *
+     * events() is the PREFERRED CakePHP 5 way to register event listeners.
+     * It receives the application-level EventManager and returns it.
+     *
+     * WHY events() OVER bootstrap():
+     *   events() is explicitly designed for listener registration.
+     *   It's called after bootstrap() and provides the EventManager directly.
+     *   CakePHP's documentation recommends this approach.
      *
      * @param \Cake\Event\EventManagerInterface $eventManager
      * @return \Cake\Event\EventManagerInterface
@@ -199,7 +262,14 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
      */
     public function events(EventManagerInterface $eventManager): EventManagerInterface
     {
-        // $eventManager->on(new SomeCustomListenerClass());
+        // =====================================================================
+        // PHASE 10: Register the NotificationListener
+        // =====================================================================
+        // This single line registers ALL 5 custom domain event handlers.
+        // The listener's implementedEvents() method tells the EventManager
+        // which events to route to which methods.
+        // =====================================================================
+        $eventManager->on(new NotificationListener());
 
         return $eventManager;
     }

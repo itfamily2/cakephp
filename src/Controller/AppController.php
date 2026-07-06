@@ -17,6 +17,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Cake\Controller\Controller;
+use Cake\Event\EventInterface;
+use Cake\Log\Log;
 
 /**
  * Application Controller
@@ -45,6 +47,17 @@ class AppController extends Controller
         $this->loadComponent('Authentication.Authentication');
         $this->loadComponent('Authorization.Authorization');
         $this->loadComponent('FormProtection');
+        
+        // Load Phase 11 Custom Components
+        $this->loadComponent('Auth');
+        $this->loadComponent('Upload');
+        $this->loadComponent('Notification');
+        $this->loadComponent('Activity');
+        $this->loadComponent('Settings');
+        $this->loadComponent('Permission');
+        $this->loadComponent('Audit', [
+            'auditActions' => ['edit', 'delete', 'add', 'checkout']
+        ]);
     }
 
     /**
@@ -57,25 +70,20 @@ class AppController extends Controller
     {
         parent::beforeFilter($event);
 
-        // Check if user is authenticated and share with view
-        $identity = $this->Authentication->getIdentity();
-        $this->set('currentUser', $identity ? $identity->getOriginalData() : null);
+        // Check if user is authenticated and share with view using AuthComponent
+        $this->set('currentUser', $this->Auth->user());
 
-        // Share site settings with all views
+        // Share site settings with all views using SettingsComponent
         try {
+            // Note: SettingsComponent caches to Configure automatically during read/write
             $settingsTable = \Cake\ORM\TableRegistry::getTableLocator()->get('Settings');
             $settings = [];
             foreach ($settingsTable->find()->all() as $s) {
+                // Pre-populate Configure for this request
+                $this->Settings->read($s->key, $s->value);
                 $settings[$s->key] = $s->value;
             }
             $this->set('siteSettings', $settings);
-            
-            // Define settings as Configure values if not already defined
-            foreach ($settings as $key => $val) {
-                if (!\Cake\Core\Configure::check($key)) {
-                    \Cake\Core\Configure::write($key, $val);
-                }
-            }
         } catch (\Exception $e) {
             $this->set('siteSettings', []);
         }
@@ -104,21 +112,51 @@ class AppController extends Controller
         }
     }
 
+    // Removed logActivity as we now use ActivityComponent
+
+    // =========================================================================
+    // PHASE 10: Controller.beforeRender Event
+    // =========================================================================
     /**
-     * Helper: Log user or system activity.
+     * Fires AFTER the action method, BEFORE the view renders.
+     *
+     * Use for: setting global view variables, switching layouts,
+     * injecting helpers, modifying serialized data for JSON responses.
+     *
+     * INTERVIEW: "beforeRender() is where I set variables that every template
+     *   needs — like the current user, site name, notification count.
+     *   It runs after the action so action-specific variables are already set."
      */
-    protected function logActivity(?int $userId, string $action, string $description): void
+    public function beforeRender(EventInterface $event): void
     {
-        try {
-            $activityLogsTable = \Cake\ORM\TableRegistry::getTableLocator()->get('ActivityLogs');
-            $log = $activityLogsTable->newEmptyEntity();
-            $log->user_id = $userId;
-            $log->action = $action;
-            $log->description = $description;
-            $log->ip_address = $this->request->clientIp() ?: '127.0.0.1';
-            $activityLogsTable->save($log);
-        } catch (\Exception $e) {
-            // Fail silently in case of issues
-        }
+        parent::beforeRender($event);
+
+        // Share timestamp for debugging
+        $this->set('renderTimestamp', date('Y-m-d H:i:s'));
+    }
+
+    // =========================================================================
+    // PHASE 10: Controller.shutdown / Controller.afterFilter Event
+    // =========================================================================
+    /**
+     * Fires AFTER the response has been fully prepared and is about to be sent.
+     *
+     * Use for: logging, cleanup, queue dispatching, analytics.
+     * This is the LAST controller event in the lifecycle.
+     *
+     * INTERVIEW: "afterFilter() is the cleanup hook. I use it for post-response
+     *   tasks like logging request duration, flushing buffers, or dispatching
+     *   background jobs that don't need to block the response."
+     */
+    public function afterFilter(EventInterface $event): void
+    {
+        parent::afterFilter($event);
+
+        // Log every request for monitoring (in production, use a proper logger)
+        Log::debug(sprintf(
+            '[PHASE 10] Controller.shutdown — %s::%s completed',
+            $this->request->getParam('controller'),
+            $this->request->getParam('action')
+        ));
     }
 }

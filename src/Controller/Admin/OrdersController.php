@@ -120,9 +120,9 @@ class OrdersController extends AppController
         $order->status = $newStatus;
 
         if ($ordersTable->save($order)) {
-            $this->Flash->success(__('Order #{0} status updated to {1}.', $order->order_number, $newStatus));
+            $this->Notification->success(__('Order #{0} status updated to {1}.', $order->order_number, $newStatus));
         } else {
-            $this->Flash->error(__('Could not update order status.'));
+            $this->Notification->error(__('Could not update order status.'));
         }
 
         return $this->redirect(['action' => 'view', $id]);
@@ -142,9 +142,9 @@ class OrdersController extends AppController
         $order = $ordersTable->get($id);
 
         if ($ordersTable->delete($order)) {
-            $this->Flash->success(__('Order deleted.'));
+            $this->Notification->success(__('Order deleted.'));
         } else {
-            $this->Flash->error(__('Order could not be deleted.'));
+            $this->Notification->error(__('Order could not be deleted.'));
         }
 
         return $this->redirect(['action' => 'index']);

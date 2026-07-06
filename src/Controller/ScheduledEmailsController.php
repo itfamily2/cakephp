@@ -64,11 +64,11 @@ class ScheduledEmailsController extends AppController
         if ($this->request->is('post')) {
             $scheduledEmail = $this->ScheduledEmails->patchEntity($scheduledEmail, $this->request->getData());
             if ($this->ScheduledEmails->save($scheduledEmail)) {
-                $this->Flash->success(__('The scheduled email has been saved.'));
+                $this->Notification->success(__('The scheduled email has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The scheduled email could not be saved. Please, try again.'));
+            $this->Notification->error(__('The scheduled email could not be saved. Please, try again.'));
         }
         $emailTemplates = $this->ScheduledEmails->EmailTemplates->find('list', limit: 200)->all();
         $emailSignatures = $this->ScheduledEmails->EmailSignatures->find('list', limit: 200)->all();
@@ -89,11 +89,11 @@ class ScheduledEmailsController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $scheduledEmail = $this->ScheduledEmails->patchEntity($scheduledEmail, $this->request->getData());
             if ($this->ScheduledEmails->save($scheduledEmail)) {
-                $this->Flash->success(__('The scheduled email has been saved.'));
+                $this->Notification->success(__('The scheduled email has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The scheduled email could not be saved. Please, try again.'));
+            $this->Notification->error(__('The scheduled email could not be saved. Please, try again.'));
         }
         $emailTemplates = $this->ScheduledEmails->EmailTemplates->find('list', limit: 200)->all();
         $emailSignatures = $this->ScheduledEmails->EmailSignatures->find('list', limit: 200)->all();
@@ -113,9 +113,9 @@ class ScheduledEmailsController extends AppController
         $scheduledEmail = $this->ScheduledEmails->get($id);
         $this->Authorization->authorize($scheduledEmail);
         if ($this->ScheduledEmails->delete($scheduledEmail)) {
-            $this->Flash->success(__('The scheduled email has been deleted.'));
+            $this->Notification->success(__('The scheduled email has been deleted.'));
         } else {
-            $this->Flash->error(__('The scheduled email could not be deleted. Please, try again.'));
+            $this->Notification->error(__('The scheduled email could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

@@ -85,11 +85,11 @@ class ContactEnquiriesController extends AppController
         if ($this->request->is('post')) {
             $contactEnquiry = $this->ContactEnquiries->patchEntity($contactEnquiry, $this->request->getData());
             if ($this->ContactEnquiries->save($contactEnquiry)) {
-                $this->Flash->success(__('The contact enquiry has been saved.'));
+                $this->Notification->success(__('The contact enquiry has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The contact enquiry could not be saved. Please, try again.'));
+            $this->Notification->error(__('The contact enquiry could not be saved. Please, try again.'));
         }
         $assignedStaffs = $this->ContactEnquiries->AssignedStaffs->find('list', limit: 200)->all();
         $this->set(compact('contactEnquiry', 'assignedStaffs'));
@@ -109,11 +109,11 @@ class ContactEnquiriesController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $contactEnquiry = $this->ContactEnquiries->patchEntity($contactEnquiry, $this->request->getData());
             if ($this->ContactEnquiries->save($contactEnquiry)) {
-                $this->Flash->success(__('The contact enquiry has been saved.'));
+                $this->Notification->success(__('The contact enquiry has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The contact enquiry could not be saved. Please, try again.'));
+            $this->Notification->error(__('The contact enquiry could not be saved. Please, try again.'));
         }
         $assignedStaffs = $this->ContactEnquiries->AssignedStaffs->find('list', limit: 200)->all();
         $this->set(compact('contactEnquiry', 'assignedStaffs'));
@@ -132,9 +132,9 @@ class ContactEnquiriesController extends AppController
         $contactEnquiry = $this->ContactEnquiries->get($id);
         $this->Authorization->authorize($contactEnquiry);
         if ($this->ContactEnquiries->delete($contactEnquiry)) {
-            $this->Flash->success(__('The contact enquiry has been deleted.'));
+            $this->Notification->success(__('The contact enquiry has been deleted.'));
         } else {
-            $this->Flash->error(__('The contact enquiry could not be deleted. Please, try again.'));
+            $this->Notification->error(__('The contact enquiry could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

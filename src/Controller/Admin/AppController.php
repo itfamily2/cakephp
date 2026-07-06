@@ -78,7 +78,7 @@ class AppController extends BaseAppController
 
             if (!$isAdmin) {
                 // Flash message stored in session, shown after redirect
-                $this->Flash->error(__('Access denied. Administrator role required.'));
+                $this->Notification->error(__('Access denied. Administrator role required.'));
                 return $this->redirect('/');
             }
         }

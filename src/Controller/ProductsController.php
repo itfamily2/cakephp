@@ -172,10 +172,10 @@ class ProductsController extends AppController
             $product = $this->Products->patchEntity($product, $this->request->getData());
 
             if ($this->Products->save($product)) {
-                $this->Flash->success(__('The product has been saved.'));
+                $this->Notification->success(__('The product has been saved.'));
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The product could not be saved. Please, try again.'));
+            $this->Notification->error(__('The product could not be saved. Please, try again.'));
         }
 
         // Phase 6: Query Builder — Fetch lists for dropdowns
@@ -201,10 +201,10 @@ class ProductsController extends AppController
             $product = $this->Products->patchEntity($product, $this->request->getData());
 
             if ($this->Products->save($product)) {
-                $this->Flash->success(__('The product has been updated.'));
+                $this->Notification->success(__('The product has been updated.'));
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The product could not be updated. Please, try again.'));
+            $this->Notification->error(__('The product could not be updated. Please, try again.'));
         }
 
         $categories = $this->Products->Categories->find('list', limit: 200)->all();
@@ -228,9 +228,9 @@ class ProductsController extends AppController
         // this will NOT execute a DELETE statement. It will execute an UPDATE
         // setting deleted_at = NOW() and block the real deletion.
         if ($this->Products->delete($product)) {
-            $this->Flash->success(__('The product has been deleted (soft deleted).'));
+            $this->Notification->success(__('The product has been deleted (soft deleted).'));
         } else {
-            $this->Flash->error(__('The product could not be deleted. Please, try again.'));
+            $this->Notification->error(__('The product could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

@@ -82,11 +82,11 @@ class CmsPagesController extends AppController
         if ($this->request->is('post')) {
             $cmsPage = $this->CmsPages->patchEntity($cmsPage, $this->request->getData());
             if ($this->CmsPages->save($cmsPage)) {
-                $this->Flash->success(__('The cms page has been saved.'));
+                $this->Notification->success(__('The cms page has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The cms page could not be saved. Please, try again.'));
+            $this->Notification->error(__('The cms page could not be saved. Please, try again.'));
         }
         $this->set(compact('cmsPage'));
     }
@@ -105,11 +105,11 @@ class CmsPagesController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $cmsPage = $this->CmsPages->patchEntity($cmsPage, $this->request->getData());
             if ($this->CmsPages->save($cmsPage)) {
-                $this->Flash->success(__('The cms page has been saved.'));
+                $this->Notification->success(__('The cms page has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The cms page could not be saved. Please, try again.'));
+            $this->Notification->error(__('The cms page could not be saved. Please, try again.'));
         }
         $this->set(compact('cmsPage'));
     }
@@ -127,9 +127,9 @@ class CmsPagesController extends AppController
         $cmsPage = $this->CmsPages->get($id);
         $this->Authorization->authorize($cmsPage);
         if ($this->CmsPages->delete($cmsPage)) {
-            $this->Flash->success(__('The cms page has been deleted.'));
+            $this->Notification->success(__('The cms page has been deleted.'));
         } else {
-            $this->Flash->error(__('The cms page could not be deleted. Please, try again.'));
+            $this->Notification->error(__('The cms page could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

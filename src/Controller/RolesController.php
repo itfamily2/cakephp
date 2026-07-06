@@ -78,11 +78,11 @@ class RolesController extends AppController
         if ($this->request->is('post')) {
             $role = $this->Roles->patchEntity($role, $this->request->getData());
             if ($this->Roles->save($role)) {
-                $this->Flash->success(__('The role has been saved.'));
+                $this->Notification->success(__('The role has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The role could not be saved. Please, try again.'));
+            $this->Notification->error(__('The role could not be saved. Please, try again.'));
         }
         $this->set(compact('role'));
     }
@@ -101,11 +101,11 @@ class RolesController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $role = $this->Roles->patchEntity($role, $this->request->getData());
             if ($this->Roles->save($role)) {
-                $this->Flash->success(__('The role has been saved.'));
+                $this->Notification->success(__('The role has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The role could not be saved. Please, try again.'));
+            $this->Notification->error(__('The role could not be saved. Please, try again.'));
         }
         $this->set(compact('role'));
     }
@@ -123,9 +123,9 @@ class RolesController extends AppController
         $role = $this->Roles->get($id);
         $this->Authorization->authorize($role);
         if ($this->Roles->delete($role)) {
-            $this->Flash->success(__('The role has been deleted.'));
+            $this->Notification->success(__('The role has been deleted.'));
         } else {
-            $this->Flash->error(__('The role could not be deleted. Please, try again.'));
+            $this->Notification->error(__('The role could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

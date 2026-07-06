@@ -261,6 +261,20 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/orders/checkout',               ['controller' => 'Orders', 'action' => 'checkout']);
         $builder->connect('/orders/bulk-update-status',     ['controller' => 'Orders', 'action' => 'bulkUpdateStatus']);
 
+    /*
+     * Here, we are connecting '/' (base path) to a controller called 'Pages',
+     * its action called 'display', and we pass a param to select the view file
+     * to use (in this case, src/Template/Pages/home.ctp)...
+     */
+    $builder->connect('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
+
+    // =========================================================================
+    // PHASE 14: Enable Data Extensions
+    // =========================================================================
+    // This allows CakePHP to detect URLs like /reports/export-data.json
+    // and automatically set the _ext request parameter.
+    $builder->setExtensions(['json', 'xml', 'csv', 'pdf']);
+
         $builder->connect('/login',    ['controller' => 'Users', 'action' => 'login'],    ['_name' => 'login']);
         $builder->connect('/logout',   ['controller' => 'Users', 'action' => 'logout'],   ['_name' => 'logout']);
         $builder->connect('/register', ['controller' => 'Users', 'action' => 'register'], ['_name' => 'register']);

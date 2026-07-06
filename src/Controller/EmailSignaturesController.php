@@ -64,11 +64,11 @@ class EmailSignaturesController extends AppController
         if ($this->request->is('post')) {
             $emailSignature = $this->EmailSignatures->patchEntity($emailSignature, $this->request->getData());
             if ($this->EmailSignatures->save($emailSignature)) {
-                $this->Flash->success(__('The email signature has been saved.'));
+                $this->Notification->success(__('The email signature has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The email signature could not be saved. Please, try again.'));
+            $this->Notification->error(__('The email signature could not be saved. Please, try again.'));
         }
         $users = $this->EmailSignatures->Users->find('list', limit: 200)->all();
         $this->set(compact('emailSignature', 'users'));
@@ -88,11 +88,11 @@ class EmailSignaturesController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $emailSignature = $this->EmailSignatures->patchEntity($emailSignature, $this->request->getData());
             if ($this->EmailSignatures->save($emailSignature)) {
-                $this->Flash->success(__('The email signature has been saved.'));
+                $this->Notification->success(__('The email signature has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The email signature could not be saved. Please, try again.'));
+            $this->Notification->error(__('The email signature could not be saved. Please, try again.'));
         }
         $users = $this->EmailSignatures->Users->find('list', limit: 200)->all();
         $this->set(compact('emailSignature', 'users'));
@@ -111,9 +111,9 @@ class EmailSignaturesController extends AppController
         $emailSignature = $this->EmailSignatures->get($id);
         $this->Authorization->authorize($emailSignature);
         if ($this->EmailSignatures->delete($emailSignature)) {
-            $this->Flash->success(__('The email signature has been deleted.'));
+            $this->Notification->success(__('The email signature has been deleted.'));
         } else {
-            $this->Flash->error(__('The email signature could not be deleted. Please, try again.'));
+            $this->Notification->error(__('The email signature could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

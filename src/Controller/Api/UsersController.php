@@ -82,7 +82,7 @@ class UsersController extends ApiController
         $usersTable->save($user);
 
         // Log activity
-        $this->logActivity($user->id, 'API Login', 'Logged in via API JWT.');
+        $this->Activity->log('API Login', 'Logged in via API JWT.');
 
         return $this->jsonSuccess([
             'token' => $token,
@@ -128,7 +128,7 @@ class UsersController extends ApiController
             $groupUsersTable->save($groupUser);
 
             // Log activity
-            $this->logActivity($user->id, 'API Register', 'Registered new account via API.');
+            $this->Activity->log('API Register', 'Registered new account via API.');
 
             // Queue Verification Email
             $this->queueEmail(
@@ -194,7 +194,7 @@ class UsersController extends ApiController
 
         $user = $usersTable->patchEntity($user, $data);
         if ($usersTable->save($user)) {
-            $this->logActivity($user->id, 'API Edit Profile', 'Updated profile details via API.');
+            $this->Activity->log('API Edit Profile', 'Updated profile details via API.');
             return $this->jsonSuccess([
                 'user' => [
                     'id' => $user->id,
@@ -268,7 +268,7 @@ class UsersController extends ApiController
         $user->email_verified = true;
         $user->verification_token = null;
         if ($usersTable->save($user)) {
-            $this->logActivity($user->id, 'API Verify Email', 'Email verified via API.');
+            $this->Activity->log('API Verify Email', 'Email verified via API.');
             return $this->jsonSuccess([], 'Email verified successfully.');
         }
 
@@ -303,7 +303,7 @@ class UsersController extends ApiController
                 \Cake\Routing\Router::url(['prefix' => false, 'controller' => 'Users', 'action' => 'resetPassword', $user->password_reset_token], true)
             );
 
-            $this->logActivity($user->id, 'API Forgot Password', 'Requested password reset via API.');
+            $this->Activity->log('API Forgot Password', 'Requested password reset via API.');
         }
 
         return $this->jsonSuccess([], 'If the email exists in our system, a password reset link has been sent.');
@@ -343,7 +343,7 @@ class UsersController extends ApiController
         $user->password_reset_expiry = null;
 
         if ($usersTable->save($user)) {
-            $this->logActivity($user->id, 'API Reset Password', 'Password reset successfully via API.');
+            $this->Activity->log('API Reset Password', 'Password reset successfully via API.');
             return $this->jsonSuccess([], 'Password reset successfully.');
         }
 
@@ -376,7 +376,7 @@ class UsersController extends ApiController
 
         $user = $usersTable->patchEntity($user, ['password' => $newPassword]);
         if ($usersTable->save($user)) {
-            $this->logActivity($user->id, 'API Change Password', 'Password changed successfully.');
+            $this->Activity->log('API Change Password', 'Password changed successfully.');
             return $this->jsonSuccess([], 'Password changed successfully.');
         }
 
@@ -414,7 +414,7 @@ class UsersController extends ApiController
             $groupUser->group_id = $groupId;
             $groupUsersTable->save($groupUser);
 
-            $this->logActivity($user->id, 'API Admin Add User', 'User added by administrator.');
+            $this->Activity->log('API Admin Add User', 'User added by administrator.');
 
             return $this->jsonSuccess([
                 'user' => [
@@ -507,7 +507,7 @@ class UsersController extends ApiController
 
         if ($usersTable->save($user)) {
             $actionWord = $isActive ? 'Activated' : 'Inactivated';
-            $this->logActivity($user->id, 'API User Status Change', 'User account ' . strtolower($actionWord) . ' by administrator.');
+            $this->Activity->log('API User Status Change', 'User account ' . strtolower($actionWord) . ' by administrator.');
             return $this->jsonSuccess([
                 'user' => [
                     'id' => $user->id,

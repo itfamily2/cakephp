@@ -63,11 +63,11 @@ class SettingsController extends AppController
         if ($this->request->is('post')) {
             $setting = $this->Settings->patchEntity($setting, $this->request->getData());
             if ($this->Settings->save($setting)) {
-                $this->Flash->success(__('The setting has been saved.'));
+                $this->Notification->success(__('The setting has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The setting could not be saved. Please, try again.'));
+            $this->Notification->error(__('The setting could not be saved. Please, try again.'));
         }
         $this->set(compact('setting'));
     }
@@ -86,11 +86,11 @@ class SettingsController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $setting = $this->Settings->patchEntity($setting, $this->request->getData());
             if ($this->Settings->save($setting)) {
-                $this->Flash->success(__('The setting has been saved.'));
+                $this->Notification->success(__('The setting has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The setting could not be saved. Please, try again.'));
+            $this->Notification->error(__('The setting could not be saved. Please, try again.'));
         }
         $this->set(compact('setting'));
     }
@@ -108,9 +108,9 @@ class SettingsController extends AppController
         $setting = $this->Settings->get($id);
         $this->Authorization->authorize($setting);
         if ($this->Settings->delete($setting)) {
-            $this->Flash->success(__('The setting has been deleted.'));
+            $this->Notification->success(__('The setting has been deleted.'));
         } else {
-            $this->Flash->error(__('The setting could not be deleted. Please, try again.'));
+            $this->Notification->error(__('The setting could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

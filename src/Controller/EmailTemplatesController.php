@@ -64,11 +64,11 @@ class EmailTemplatesController extends AppController
         if ($this->request->is('post')) {
             $emailTemplate = $this->EmailTemplates->patchEntity($emailTemplate, $this->request->getData());
             if ($this->EmailTemplates->save($emailTemplate)) {
-                $this->Flash->success(__('The email template has been saved.'));
+                $this->Notification->success(__('The email template has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The email template could not be saved. Please, try again.'));
+            $this->Notification->error(__('The email template could not be saved. Please, try again.'));
         }
         $users = $this->EmailTemplates->Users->find('list', limit: 200)->all();
         $this->set(compact('emailTemplate', 'users'));
@@ -88,11 +88,11 @@ class EmailTemplatesController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $emailTemplate = $this->EmailTemplates->patchEntity($emailTemplate, $this->request->getData());
             if ($this->EmailTemplates->save($emailTemplate)) {
-                $this->Flash->success(__('The email template has been saved.'));
+                $this->Notification->success(__('The email template has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The email template could not be saved. Please, try again.'));
+            $this->Notification->error(__('The email template could not be saved. Please, try again.'));
         }
         $users = $this->EmailTemplates->Users->find('list', limit: 200)->all();
         $this->set(compact('emailTemplate', 'users'));
@@ -111,9 +111,9 @@ class EmailTemplatesController extends AppController
         $emailTemplate = $this->EmailTemplates->get($id);
         $this->Authorization->authorize($emailTemplate);
         if ($this->EmailTemplates->delete($emailTemplate)) {
-            $this->Flash->success(__('The email template has been deleted.'));
+            $this->Notification->success(__('The email template has been deleted.'));
         } else {
-            $this->Flash->error(__('The email template could not be deleted. Please, try again.'));
+            $this->Notification->error(__('The email template could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

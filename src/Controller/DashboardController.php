@@ -213,7 +213,7 @@ class DashboardController extends AppController
         }
 
         // Flash: one-time session message shown after redirect
-        $this->Flash->success(__('Dashboard cache cleared successfully.'));
+        $this->Notification->success(__('Dashboard cache cleared successfully.'));
 
         // redirect() returns a Response object — always return it
         return $this->redirect(['action' => 'index']);

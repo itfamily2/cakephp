@@ -170,7 +170,7 @@ class PermissionsController extends AppController
                 // --- FLASH: session-based one-time notification ---
                 // FlashComponent writes to the session.
                 // $this->Flash->render() in the template reads and clears it.
-                $this->Flash->success(__('Permission saved.'));
+                $this->Notification->success(__('Permission saved.'));
 
                 // --- REDIRECT: sends HTTP 302 response to the browser ---
                 // Using array format generates URL via the Router
@@ -179,7 +179,7 @@ class PermissionsController extends AppController
             }
 
             // Validation or save failure — flash error, re-render form
-            $this->Flash->error(__('Could not save permission. Check the highlighted fields.'));
+            $this->Notification->error(__('Could not save permission. Check the highlighted fields.'));
         }
 
         // Pass entity to view so the form shows validation errors
@@ -212,11 +212,11 @@ class PermissionsController extends AppController
             );
 
             if ($permissionsTable->save($permission)) {
-                $this->Flash->success(__('Permission updated.'));
+                $this->Notification->success(__('Permission updated.'));
                 return $this->redirect(['action' => 'index']);
             }
 
-            $this->Flash->error(__('Could not update permission.'));
+            $this->Notification->error(__('Could not update permission.'));
         }
 
         $this->set(compact('permission'));
@@ -238,9 +238,9 @@ class PermissionsController extends AppController
         $permission = $permissionsTable->get($id);
 
         if ($permissionsTable->delete($permission)) {
-            $this->Flash->success(__('Permission deleted.'));
+            $this->Notification->success(__('Permission deleted.'));
         } else {
-            $this->Flash->error(__('Permission could not be deleted.'));
+            $this->Notification->error(__('Permission could not be deleted.'));
         }
 
         return $this->redirect(['action' => 'index']);
@@ -357,7 +357,7 @@ class PermissionsController extends AppController
             $uploadedFiles = $this->request->getUploadedFiles();
 
             if (empty($uploadedFiles['csv_file'])) {
-                $this->Flash->error(__('No file uploaded.'));
+                $this->Notification->error(__('No file uploaded.'));
                 return null;
             }
 
@@ -366,20 +366,20 @@ class PermissionsController extends AppController
 
             // Check for upload errors (UPLOAD_ERR_OK = 0 means success)
             if ($file->getError() !== UPLOAD_ERR_OK) {
-                $this->Flash->error(__('File upload failed with error code: {0}', $file->getError()));
+                $this->Notification->error(__('File upload failed with error code: {0}', $file->getError()));
                 return null;
             }
 
             // Validate MIME type — only allow CSV
             $allowedTypes = ['text/csv', 'application/csv', 'text/plain'];
             if (!in_array($file->getClientMediaType(), $allowedTypes)) {
-                $this->Flash->error(__('Only CSV files are allowed.'));
+                $this->Notification->error(__('Only CSV files are allowed.'));
                 return null;
             }
 
             // Validate file size — max 2MB
             if ($file->getSize() > 2 * 1024 * 1024) {
-                $this->Flash->error(__('File too large. Maximum size is 2MB.'));
+                $this->Notification->error(__('File too large. Maximum size is 2MB.'));
                 return null;
             }
 
@@ -407,7 +407,7 @@ class PermissionsController extends AppController
                 fclose($handle);
             }
 
-            $this->Flash->success(__('Imported {0} permissions successfully.', $imported));
+            $this->Notification->success(__('Imported {0} permissions successfully.', $imported));
             return $this->redirect(['action' => 'index']);
         }
     }
@@ -447,7 +447,7 @@ class PermissionsController extends AppController
             return $this->send($response);
         }
 
-        $this->Flash->error(__('This endpoint only accepts AJAX requests.'));
+        $this->Notification->error(__('This endpoint only accepts AJAX requests.'));
         return $this->redirect(['action' => 'index']);
     }
 }

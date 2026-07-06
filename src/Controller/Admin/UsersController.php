@@ -120,10 +120,10 @@ class UsersController extends AppController
             $user = $usersTable->patchEntity($user, $data);
 
             if ($usersTable->save($user)) {
-                $this->Flash->success(__('User created successfully by admin.'));
+                $this->Notification->success(__('User created successfully by admin.'));
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('Could not create user.'));
+            $this->Notification->error(__('Could not create user.'));
         }
 
         $roles  = $this->fetchTable('Roles')->find('list')->all();
@@ -154,10 +154,10 @@ class UsersController extends AppController
             $user = $usersTable->patchEntity($user, $data);
 
             if ($usersTable->save($user)) {
-                $this->Flash->success(__('User updated by admin.'));
+                $this->Notification->success(__('User updated by admin.'));
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('Could not update user.'));
+            $this->Notification->error(__('Could not update user.'));
         }
 
         $this->set(compact('user'));
@@ -177,9 +177,9 @@ class UsersController extends AppController
         $user = $usersTable->get($id);
 
         if ($usersTable->delete($user)) {
-            $this->Flash->success(__('User deleted.'));
+            $this->Notification->success(__('User deleted.'));
         } else {
-            $this->Flash->error(__('User could not be deleted.'));
+            $this->Notification->error(__('User could not be deleted.'));
         }
 
         return $this->redirect(['action' => 'index']);
@@ -203,9 +203,9 @@ class UsersController extends AppController
 
         if ($usersTable->save($user)) {
             $state = $user->is_active ? 'activated' : 'deactivated';
-            $this->Flash->success(__("User has been {0}.", $state));
+            $this->Notification->success(__("User has been {0}.", $state));
         } else {
-            $this->Flash->error(__('Could not update user status.'));
+            $this->Notification->error(__('Could not update user status.'));
         }
 
         return $this->redirect(['action' => 'index']);

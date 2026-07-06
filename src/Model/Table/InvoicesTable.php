@@ -7,6 +7,13 @@ use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\Event\Event;
+use Cake\Event\EventInterface;
+use Cake\Event\EventManager;
+use Cake\Datasource\EntityInterface;
+use Cake\Log\Log;
+use App\Event\DomainEvents;
+use ArrayObject;
 
 /**
  * Invoices Model
@@ -114,5 +121,80 @@ class InvoicesTable extends Table
         $rules->add($rules->existsIn(['order_id'], 'Orders'), ['errorField' => 'order_id']);
 
         return $rules;
+    }
+
+    // =========================================================================
+    // PHASE 10: Model Events for Invoices
+    // =========================================================================
+
+    /**
+     * Model.beforeMarshal — Normalize invoice data before entity creation.
+     */
+    public function beforeMarshal(EventInterface $event, ArrayObject $data, ArrayObject $options): void
+    {
+        Log::debug('[PHASE 10] Model.beforeMarshal — Invoices data being marshalled');
+
+        // Auto-generate invoice number if not provided
+        if (empty($data['invoice_number'])) {
+            $data['invoice_number'] = 'INV-' . date('Ymd') . '-' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 6));
+        }
+
+        // Normalize status to lowercase
+        if (!empty($data['status'])) {
+            $data['status'] = strtolower($data['status']);
+        }
+    }
+
+    /**
+     * Model.beforeSave — Set defaults for new invoices.
+     */
+    public function beforeSave(EventInterface $event, EntityInterface $entity, ArrayObject $options): void
+    {
+        Log::debug(sprintf(
+            '[PHASE 10] Model.beforeSave — Invoice %s (isNew: %s)',
+            $entity->invoice_number ?? 'N/A',
+            $entity->isNew() ? 'yes' : 'no'
+        ));
+
+        // Default status for new invoices
+        if ($entity->isNew() && empty($entity->status)) {
+            $entity->status = 'unpaid';
+        }
+    }
+
+    /**
+     * Model.afterSave — Dispatch Invoice.paid when status changes to 'paid'.
+     *
+     * INTERVIEW: "I check isDirty('status') to ensure the event only fires
+     *   when the status actually changed, not on every save. This prevents
+     *   duplicate notifications when updating other invoice fields."
+     */
+    public function afterSave(EventInterface $event, EntityInterface $entity, ArrayObject $options): void
+    {
+        Log::info(sprintf(
+            '[PHASE 10] Model.afterSave — Invoice %s saved (status: %s)',
+            $entity->invoice_number ?? 'N/A',
+            $entity->status ?? 'unknown'
+        ));
+
+        // Dispatch Invoice.paid event when status changes to 'paid'
+        if ($entity->isDirty('status') && strtolower($entity->status ?? '') === 'paid') {
+            EventManager::instance()->dispatch(new Event(
+                DomainEvents::INVOICE_PAID,
+                $this,
+                ['invoice' => $entity]
+            ));
+        }
+    }
+
+    /**
+     * Model.afterDelete — Log invoice deletion.
+     */
+    public function afterDelete(EventInterface $event, EntityInterface $entity, ArrayObject $options): void
+    {
+        Log::info(sprintf(
+            '[PHASE 10] Model.afterDelete — Invoice %s deleted',
+            $entity->invoice_number ?? 'N/A'
+        ));
     }
 }

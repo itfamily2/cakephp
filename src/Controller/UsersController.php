@@ -149,7 +149,7 @@ class UsersController extends AppController
             
             if (!$user->is_active) {
                 $this->Authentication->logout();
-                $this->Flash->error(__('Your account is deactivated. Please contact support.'));
+                $this->Notification->error(__('Your account is deactivated. Please contact support.'));
                 return $this->redirect(['action' => 'login']);
             }
 
@@ -159,7 +159,7 @@ class UsersController extends AppController
             $this->Users->save($user);
 
             // Log activity
-            $this->logActivity($user->id, 'Login', 'Logged in via Form.');
+            $this->Activity->log('Login', 'Logged in via Form.');
             $this->clearDashboardCache();
 
             $redirect = $this->request->getQuery('redirect', '/');
@@ -167,7 +167,7 @@ class UsersController extends AppController
         }
 
         if ($this->request->is('post')) {
-            $this->Flash->error(__('Invalid username or password.'));
+            $this->Notification->error(__('Invalid username or password.'));
         }
     }
 
@@ -181,7 +181,7 @@ class UsersController extends AppController
         $identity = $this->Authentication->getIdentity();
         if ($identity) {
             $user = $identity->getOriginalData();
-            $this->logActivity($user->id, 'Logout', 'Logged out from session.');
+            $this->Activity->log('Logout', 'Logged out from session.');
         }
 
         $this->Authentication->logout();
@@ -220,7 +220,7 @@ class UsersController extends AppController
                 $groupUser->group_id = 1;
                 $groupUsersTable->save($groupUser);
 
-                $this->logActivity($user->id, 'Register', 'Registered new account.');
+                $this->Activity->log('Register', 'Registered new account.');
                 $this->clearDashboardCache();
 
                 // Log email queue registration
@@ -231,10 +231,10 @@ class UsersController extends AppController
                     \Cake\Routing\Router::url(['action' => 'verifyEmail', $user->verification_token], true)
                 );
 
-                $this->Flash->success(__('Registration successful. Please check your email to verify your account.'));
+                $this->Notification->success(__('Registration successful. Please check your email to verify your account.'));
                 return $this->redirect(['action' => 'login']);
             }
-            $this->Flash->error(__('Registration failed. Please review the errors below.'));
+            $this->Notification->error(__('Registration failed. Please review the errors below.'));
         }
         $this->set(compact('user'));
     }
@@ -246,24 +246,24 @@ class UsersController extends AppController
     {
         $this->Authorization->skipAuthorization();
         if (!$token) {
-            $this->Flash->error(__('Invalid verification token.'));
+            $this->Notification->error(__('Invalid verification token.'));
             return $this->redirect(['action' => 'login']);
         }
 
         $user = $this->Users->find()->where(['verification_token' => $token])->first();
         if (!$user) {
-            $this->Flash->error(__('User not found or already verified.'));
+            $this->Notification->error(__('User not found or already verified.'));
             return $this->redirect(['action' => 'login']);
         }
 
         $user->email_verified = true;
         $user->verification_token = null;
         if ($this->Users->save($user)) {
-            $this->logActivity($user->id, 'Verify Email', 'Email address verified successfully.');
+            $this->Activity->log('Verify Email', 'Email address verified successfully.');
             $this->clearDashboardCache();
-            $this->Flash->success(__('Email verified successfully. You can now log in.'));
+            $this->Notification->success(__('Email verified successfully. You can now log in.'));
         } else {
-            $this->Flash->error(__('Unable to verify email. Please try again.'));
+            $this->Notification->error(__('Unable to verify email. Please try again.'));
         }
 
         return $this->redirect(['action' => 'login']);
@@ -291,10 +291,10 @@ class UsersController extends AppController
                     \Cake\Routing\Router::url(['action' => 'resetPassword', $user->password_reset_token], true)
                 );
 
-                $this->logActivity($user->id, 'Forgot Password', 'Requested password reset.');
+                $this->Activity->log('Forgot Password', 'Requested password reset.');
             }
 
-            $this->Flash->success(__('If the email exists, a password reset link has been sent.'));
+            $this->Notification->success(__('If the email exists, a password reset link has been sent.'));
             return $this->redirect(['action' => 'login']);
         }
     }
@@ -306,7 +306,7 @@ class UsersController extends AppController
     {
         $this->Authorization->skipAuthorization();
         if (!$token) {
-            $this->Flash->error(__('Invalid password reset token.'));
+            $this->Notification->error(__('Invalid password reset token.'));
             return $this->redirect(['action' => 'login']);
         }
 
@@ -318,7 +318,7 @@ class UsersController extends AppController
             ->first();
 
         if (!$user) {
-            $this->Flash->error(__('Invalid or expired reset token.'));
+            $this->Notification->error(__('Invalid or expired reset token.'));
             return $this->redirect(['action' => 'login']);
         }
 
@@ -328,11 +328,11 @@ class UsersController extends AppController
             $user->password_reset_expiry = null;
             
             if ($this->Users->save($user)) {
-                $this->logActivity($user->id, 'Reset Password', 'Password reset successfully.');
-                $this->Flash->success(__('Password reset successfully. You can now log in.'));
+                $this->Activity->log('Reset Password', 'Password reset successfully.');
+                $this->Notification->success(__('Password reset successfully. You can now log in.'));
                 return $this->redirect(['action' => 'login']);
             }
-            $this->Flash->error(__('Unable to reset password. Please try again.'));
+            $this->Notification->error(__('Unable to reset password. Please try again.'));
         }
         $this->set(compact('user'));
     }
@@ -389,15 +389,15 @@ class UsersController extends AppController
         $user->last_login_ip = $this->request->clientIp();
         $this->Users->save($user);
 
-        $this->logActivity($user->id, 'Social Login', 'Logged in via ' . ucfirst($provider));
+        $this->Activity->log('Social Login', 'Logged in via ' . ucfirst($provider));
 
         if ($isNew) {
             // Requirement: "We can show Change Password page after registration using social account"
-            $this->Flash->success(__('Welcome! Since you logged in with social login, please set a custom password.'));
+            $this->Notification->success(__('Welcome! Since you logged in with social login, please set a custom password.'));
             return $this->redirect(['action' => 'changePassword']);
         }
 
-        $this->Flash->success(__('Logged in successfully via ' . ucfirst($provider)));
+        $this->Notification->success(__('Logged in successfully via ' . ucfirst($provider)));
         return $this->redirect('/');
     }
 
@@ -419,29 +419,24 @@ class UsersController extends AppController
             // Image upload
             $attachment = $this->request->getData('profile_image_file');
             if ($attachment && $attachment->getError() === UPLOAD_ERR_OK) {
-                $name = $attachment->getClientFilename();
-                $ext = pathinfo($name, PATHINFO_EXTENSION);
-                $newName = 'profile_' . $user->id . '_' . time() . '.' . $ext;
-                
-                $uploadPath = WWW_ROOT . 'uploads' . DS . 'profiles' . DS;
-                if (!is_dir($uploadPath)) {
-                    mkdir($uploadPath, 0777, true);
+                try {
+                    $newName = $this->Upload->upload($attachment, 'profiles');
+                    $data['profile_image'] = $newName;
+                    
+                    // Simulated resizing helper
+                    $this->resizeImage(WWW_ROOT . 'uploads' . DS . 'profiles' . DS . $newName, 150, 150);
+                } catch (\Exception $e) {
+                    $this->Notification->error($e->getMessage());
                 }
-                
-                $attachment->moveTo($uploadPath . $newName);
-                $data['profile_image'] = $newName;
-
-                // Simulated resizing helper
-                $this->resizeImage($uploadPath . $newName, 150, 150);
             }
 
             $user = $this->Users->patchEntity($user, $data);
             if ($this->Users->save($user)) {
-                $this->logActivity($user->id, 'Update Profile', 'Updated profile information.');
-                $this->Flash->success(__('Profile updated successfully.'));
+                $this->Activity->log('Update Profile', 'Updated profile information.');
+                $this->Notification->success(__('Profile updated successfully.'));
                 return $this->redirect(['action' => 'profile']);
             }
-            $this->Flash->error(__('Profile could not be updated. Please try again.'));
+            $this->Notification->error(__('Profile could not be updated. Please try again.'));
         }
 
         $this->set(compact('user'));
@@ -462,18 +457,18 @@ class UsersController extends AppController
             $hasher = new \Authentication\PasswordHasher\DefaultPasswordHasher();
             
             if (!$hasher->check($currentPassword, $user->password)) {
-                $this->Flash->error(__('Current password is incorrect.'));
+                $this->Notification->error(__('Current password is incorrect.'));
             } else {
                 $user = $this->Users->patchEntity($user, [
                     'password' => $this->request->getData('new_password')
                 ]);
                 
                 if ($this->Users->save($user)) {
-                    $this->logActivity($user->id, 'Change Password', 'Changed password successfully.');
-                    $this->Flash->success(__('Password changed successfully.'));
+                    $this->Activity->log('Change Password', 'Changed password successfully.');
+                    $this->Notification->success(__('Password changed successfully.'));
                     return $this->redirect(['action' => 'profile']);
                 }
-                $this->Flash->error(__('Unable to change password.'));
+                $this->Notification->error(__('Unable to change password.'));
             }
         }
         $this->set(compact('user'));
@@ -492,10 +487,10 @@ class UsersController extends AppController
 
         if ($this->Users->delete($user)) {
             $this->Authentication->logout();
-            $this->Flash->success(__('Your account has been deleted successfully.'));
+            $this->Notification->success(__('Your account has been deleted successfully.'));
             return $this->redirect(['action' => 'login']);
         }
-        $this->Flash->error(__('Unable to delete account.'));
+        $this->Notification->error(__('Unable to delete account.'));
         return $this->redirect(['action' => 'profile']);
     }
 
@@ -578,12 +573,12 @@ class UsersController extends AppController
                     $groupUsersTable->save($groupUser);
                 }
 
-                $this->logActivity($user->id, 'Admin Add User', 'Admin created user ' . $user->username);
+                $this->Activity->log('Admin Add User', 'Admin created user ' . $user->username);
                 $this->clearDashboardCache();
-                $this->Flash->success(__('User added successfully.'));
+                $this->Notification->success(__('User added successfully.'));
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('Unable to add user.'));
+            $this->Notification->error(__('Unable to add user.'));
         }
 
         $roles = TableRegistry::getTableLocator()->get('Roles')->find('list')->all();
@@ -629,12 +624,12 @@ class UsersController extends AppController
                     $groupUsersTable->save($groupUser);
                 }
 
-                $this->logActivity($user->id, 'Admin Edit User', 'Admin updated user configuration.');
+                $this->Activity->log('Admin Edit User', 'Admin updated user configuration.');
                 $this->clearDashboardCache();
-                $this->Flash->success(__('User updated successfully.'));
+                $this->Notification->success(__('User updated successfully.'));
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('Unable to update user.'));
+            $this->Notification->error(__('Unable to update user.'));
         }
 
         $roles = TableRegistry::getTableLocator()->get('Roles')->find('list')->all();
@@ -657,9 +652,9 @@ class UsersController extends AppController
         
         if ($this->Users->delete($user)) {
             $this->clearDashboardCache();
-            $this->Flash->success(__('User has been deleted.'));
+            $this->Notification->success(__('User has been deleted.'));
         } else {
-            $this->Flash->error(__('Unable to delete user.'));
+            $this->Notification->error(__('Unable to delete user.'));
         }
 
         return $this->redirect(['action' => 'index']);
@@ -676,11 +671,11 @@ class UsersController extends AppController
         
         if ($this->Users->save($user)) {
             $status = $user->is_active ? 'activated' : 'deactivated';
-            $this->logActivity($user->id, 'Admin Toggle Status', 'Admin ' . $status . ' user account.');
+            $this->Activity->log('Admin Toggle Status', 'Admin ' . $status . ' user account.');
             $this->clearDashboardCache();
-            $this->Flash->success(__('User has been ' . $status . '.'));
+            $this->Notification->success(__('User has been ' . $status . '.'));
         } else {
-            $this->Flash->error(__('Unable to change status.'));
+            $this->Notification->error(__('Unable to change status.'));
         }
 
         return $this->redirect(['action' => 'index']);
@@ -710,11 +705,11 @@ class UsersController extends AppController
             if ($inactivate === '1') {
                 $msg = 'User logged out and account deactivated.';
             }
-            $this->logActivity($user->id, 'Admin Force Logout', 'Admin force logged out this user.');
+            $this->Activity->log('Admin Force Logout', 'Admin force logged out this user.');
             $this->clearDashboardCache();
-            $this->Flash->success(__($msg));
+            $this->Notification->success(__($msg));
         } else {
-            $this->Flash->error(__('Unable to force logout user.'));
+            $this->Notification->error(__('Unable to force logout user.'));
         }
 
         return $this->redirect(['action' => 'dashboard']);
@@ -770,10 +765,10 @@ class UsersController extends AppController
                 }
                 fclose($handle);
                 $this->clearDashboardCache();
-                $this->Flash->success(__('Import finished. Successfully imported ' . $successCount . ' users. Failed: ' . $failCount));
+                $this->Notification->success(__('Import finished. Successfully imported ' . $successCount . ' users. Failed: ' . $failCount));
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('Please upload a valid CSV file.'));
+            $this->Notification->error(__('Please upload a valid CSV file.'));
         }
     }
 
@@ -834,7 +829,7 @@ class UsersController extends AppController
             Cache::clear('_cake_routes_');
         } catch (\Exception $e) {}
 
-        $this->Flash->success(__('All CakePHP system caches cleared successfully.'));
+        $this->Notification->success(__('All CakePHP system caches cleared successfully.'));
         return $this->redirect($this->referer('/'));
     }
 

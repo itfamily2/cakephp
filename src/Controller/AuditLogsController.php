@@ -85,11 +85,11 @@ class AuditLogsController extends AppController
         if ($this->request->is('post')) {
             $auditLog = $this->AuditLogs->patchEntity($auditLog, $this->request->getData());
             if ($this->AuditLogs->save($auditLog)) {
-                $this->Flash->success(__('The audit log has been saved.'));
+                $this->Notification->success(__('The audit log has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The audit log could not be saved. Please, try again.'));
+            $this->Notification->error(__('The audit log could not be saved. Please, try again.'));
         }
         $users = $this->AuditLogs->Users->find('list', limit: 200)->all();
         $this->set(compact('auditLog', 'users'));
@@ -109,11 +109,11 @@ class AuditLogsController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $auditLog = $this->AuditLogs->patchEntity($auditLog, $this->request->getData());
             if ($this->AuditLogs->save($auditLog)) {
-                $this->Flash->success(__('The audit log has been saved.'));
+                $this->Notification->success(__('The audit log has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The audit log could not be saved. Please, try again.'));
+            $this->Notification->error(__('The audit log could not be saved. Please, try again.'));
         }
         $users = $this->AuditLogs->Users->find('list', limit: 200)->all();
         $this->set(compact('auditLog', 'users'));
@@ -132,9 +132,9 @@ class AuditLogsController extends AppController
         $auditLog = $this->AuditLogs->get($id);
         $this->Authorization->authorize($auditLog);
         if ($this->AuditLogs->delete($auditLog)) {
-            $this->Flash->success(__('The audit log has been deleted.'));
+            $this->Notification->success(__('The audit log has been deleted.'));
         } else {
-            $this->Flash->error(__('The audit log could not be deleted. Please, try again.'));
+            $this->Notification->error(__('The audit log could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

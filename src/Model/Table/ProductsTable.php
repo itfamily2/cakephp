@@ -7,8 +7,12 @@ use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\Event\Event;
 use Cake\Event\EventInterface;
+use Cake\Event\EventManager;
 use Cake\Datasource\EntityInterface;
+use Cake\Log\Log;
+use App\Event\DomainEvents;
 use ArrayObject;
 
 /**
@@ -243,16 +247,93 @@ class ProductsTable extends Table
         return $query;
     }
 
-    // =========================================================================
-    // MODEL EVENTS — Phase 5
-    // =========================================================================
+    /**
+     * Model.beforeFind — Phase 10
+     *
+     * Fires before every SELECT query on Products.
+     * SoftDeleteBehavior already adds deleted_at IS NULL, but this is
+     * where you'd add additional global filters.
+     */
+    public function beforeFind(EventInterface $event, SelectQuery $query, ArrayObject $options, bool $primary): void
+    {
+        Log::debug('[PHASE 10] Model.beforeFind — Products query intercepted');
+    }
 
     /**
-     * afterSave() — Invalidate product caches after every save.
+     * Model.beforeMarshal — Phase 10
+     *
+     * Normalize product data before entity creation.
+     */
+    public function beforeMarshal(EventInterface $event, ArrayObject $data, ArrayObject $options): void
+    {
+        Log::debug('[PHASE 10] Model.beforeMarshal — Products data being marshalled');
+
+        // Trim product name
+        if (!empty($data['name'])) {
+            $data['name'] = trim($data['name']);
+        }
+
+        // Uppercase SKU
+        if (!empty($data['sku'])) {
+            $data['sku'] = strtoupper(trim($data['sku']));
+        }
+
+        // Default stock to 0 if not set
+        if (!isset($data['stock'])) {
+            $data['stock'] = 0;
+        }
+    }
+
+    /**
+     * Model.beforeRules — Phase 10
+     */
+    public function beforeRules(EventInterface $event, EntityInterface $entity, ArrayObject $options, string $operation): void
+    {
+        Log::debug(sprintf('[PHASE 10] Model.beforeRules — Products (operation: %s)', $operation));
+    }
+
+    /**
+     * Model.afterRules — Phase 10
+     */
+    public function afterRules(EventInterface $event, EntityInterface $entity, ArrayObject $options, bool $result, string $operation): void
+    {
+        Log::debug(sprintf('[PHASE 10] Model.afterRules — Products rules %s', $result ? 'PASSED' : 'FAILED'));
+    }
+
+    /**
+     * Model.beforeSave — Phase 10
+     *
+     * Set defaults, validate business logic before SQL.
+     */
+    public function beforeSave(EventInterface $event, EntityInterface $entity, ArrayObject $options): void
+    {
+        Log::debug(sprintf(
+            '[PHASE 10] Model.beforeSave — Product %s (isNew: %s)',
+            $entity->name ?? 'N/A',
+            $entity->isNew() ? 'yes' : 'no'
+        ));
+    }
+
+    /**
+     * afterSave() — Phase 10: Invalidate caches + dispatch Product.lowStock.
+     *
+     * INTERVIEW: "I check the stock level after every save. If it drops
+     *   below the threshold, I dispatch Product.lowStock. The listener
+     *   will alert the procurement team without the controller knowing."
      */
     public function afterSave(EventInterface $event, EntityInterface $entity, ArrayObject $options): void
     {
         \Cake\Cache\Cache::delete('dashboard_total_products', 'redis');
+
+        // Phase 10: Dispatch Product.lowStock if stock is below threshold
+        $lowStockThreshold = 5;
+        if (isset($entity->stock) && $entity->stock <= $lowStockThreshold && $entity->stock >= 0) {
+            EventManager::instance()->dispatch(new Event(
+                DomainEvents::PRODUCT_LOW_STOCK,
+                $this,
+                ['product' => $entity, 'threshold' => $lowStockThreshold]
+            ));
+        }
     }
 
     /**
@@ -260,8 +341,25 @@ class ProductsTable extends Table
      */
     public function beforeDelete(EventInterface $event, EntityInterface $entity, ArrayObject $options): void
     {
-        // Fire custom event that other listeners can react to
-        // e.g. NotificationListener could alert admins about product deletion
-        $this->dispatchEvent('Product.deleted', ['product' => $entity]);
+        Log::info(sprintf(
+            '[PHASE 10] Model.beforeDelete — Product %s (ID: %d) being deleted',
+            $entity->name ?? 'N/A',
+            $entity->id ?? 0
+        ));
+    }
+
+    /**
+     * Model.afterDelete — Phase 10
+     *
+     * Cleanup after product deletion.
+     */
+    public function afterDelete(EventInterface $event, EntityInterface $entity, ArrayObject $options): void
+    {
+        Log::info(sprintf(
+            '[PHASE 10] Model.afterDelete — Product %s deleted',
+            $entity->name ?? 'N/A'
+        ));
+
+        \Cake\Cache\Cache::delete('dashboard_total_products', 'redis');
     }
 }

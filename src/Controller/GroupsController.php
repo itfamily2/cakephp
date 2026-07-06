@@ -79,11 +79,11 @@ class GroupsController extends AppController
         if ($this->request->is('post')) {
             $group = $this->Groups->patchEntity($group, $this->request->getData());
             if ($this->Groups->save($group)) {
-                $this->Flash->success(__('The group has been saved.'));
+                $this->Notification->success(__('The group has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The group could not be saved. Please, try again.'));
+            $this->Notification->error(__('The group could not be saved. Please, try again.'));
         }
         $parentGroups = $this->Groups->ParentGroups->find('list', limit: 200)->all();
         $this->set(compact('group', 'parentGroups'));
@@ -103,11 +103,11 @@ class GroupsController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $group = $this->Groups->patchEntity($group, $this->request->getData());
             if ($this->Groups->save($group)) {
-                $this->Flash->success(__('The group has been saved.'));
+                $this->Notification->success(__('The group has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The group could not be saved. Please, try again.'));
+            $this->Notification->error(__('The group could not be saved. Please, try again.'));
         }
         $parentGroups = $this->Groups->ParentGroups->find('list', limit: 200)->all();
         $this->set(compact('group', 'parentGroups'));
@@ -126,9 +126,9 @@ class GroupsController extends AppController
         $group = $this->Groups->get($id);
         $this->Authorization->authorize($group);
         if ($this->Groups->delete($group)) {
-            $this->Flash->success(__('The group has been deleted.'));
+            $this->Notification->success(__('The group has been deleted.'));
         } else {
-            $this->Flash->error(__('The group could not be deleted. Please, try again.'));
+            $this->Notification->error(__('The group could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

@@ -64,11 +64,11 @@ class OrderItemsController extends AppController
         if ($this->request->is('post')) {
             $orderItem = $this->OrderItems->patchEntity($orderItem, $this->request->getData());
             if ($this->OrderItems->save($orderItem)) {
-                $this->Flash->success(__('The order item has been saved.'));
+                $this->Notification->success(__('The order item has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The order item could not be saved. Please, try again.'));
+            $this->Notification->error(__('The order item could not be saved. Please, try again.'));
         }
         $orders = $this->OrderItems->Orders->find('list', limit: 200)->all();
         $products = $this->OrderItems->Products->find('list', limit: 200)->all();
@@ -89,11 +89,11 @@ class OrderItemsController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $orderItem = $this->OrderItems->patchEntity($orderItem, $this->request->getData());
             if ($this->OrderItems->save($orderItem)) {
-                $this->Flash->success(__('The order item has been saved.'));
+                $this->Notification->success(__('The order item has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The order item could not be saved. Please, try again.'));
+            $this->Notification->error(__('The order item could not be saved. Please, try again.'));
         }
         $orders = $this->OrderItems->Orders->find('list', limit: 200)->all();
         $products = $this->OrderItems->Products->find('list', limit: 200)->all();
@@ -113,9 +113,9 @@ class OrderItemsController extends AppController
         $orderItem = $this->OrderItems->get($id);
         $this->Authorization->authorize($orderItem);
         if ($this->OrderItems->delete($orderItem)) {
-            $this->Flash->success(__('The order item has been deleted.'));
+            $this->Notification->success(__('The order item has been deleted.'));
         } else {
-            $this->Flash->error(__('The order item could not be deleted. Please, try again.'));
+            $this->Notification->error(__('The order item could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

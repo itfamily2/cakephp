@@ -64,11 +64,11 @@ class SentEmailsController extends AppController
         if ($this->request->is('post')) {
             $sentEmail = $this->SentEmails->patchEntity($sentEmail, $this->request->getData());
             if ($this->SentEmails->save($sentEmail)) {
-                $this->Flash->success(__('The sent email has been saved.'));
+                $this->Notification->success(__('The sent email has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The sent email could not be saved. Please, try again.'));
+            $this->Notification->error(__('The sent email could not be saved. Please, try again.'));
         }
         $emailTemplates = $this->SentEmails->EmailTemplates->find('list', limit: 200)->all();
         $emailSignatures = $this->SentEmails->EmailSignatures->find('list', limit: 200)->all();
@@ -89,11 +89,11 @@ class SentEmailsController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $sentEmail = $this->SentEmails->patchEntity($sentEmail, $this->request->getData());
             if ($this->SentEmails->save($sentEmail)) {
-                $this->Flash->success(__('The sent email has been saved.'));
+                $this->Notification->success(__('The sent email has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The sent email could not be saved. Please, try again.'));
+            $this->Notification->error(__('The sent email could not be saved. Please, try again.'));
         }
         $emailTemplates = $this->SentEmails->EmailTemplates->find('list', limit: 200)->all();
         $emailSignatures = $this->SentEmails->EmailSignatures->find('list', limit: 200)->all();
@@ -113,9 +113,9 @@ class SentEmailsController extends AppController
         $sentEmail = $this->SentEmails->get($id);
         $this->Authorization->authorize($sentEmail);
         if ($this->SentEmails->delete($sentEmail)) {
-            $this->Flash->success(__('The sent email has been deleted.'));
+            $this->Notification->success(__('The sent email has been deleted.'));
         } else {
-            $this->Flash->error(__('The sent email could not be deleted. Please, try again.'));
+            $this->Notification->error(__('The sent email could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

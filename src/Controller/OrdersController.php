@@ -245,10 +245,10 @@ class OrdersController extends AppController
             // PHASE 6: Marshalling
             $order = $this->Orders->patchEntity($order, $this->request->getData());
             if ($this->Orders->save($order)) {
-                $this->Flash->success(__('The order has been saved.'));
+                $this->Notification->success(__('The order has been saved.'));
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The order could not be saved. Please, try again.'));
+            $this->Notification->error(__('The order could not be saved. Please, try again.'));
         }
         $users = $this->Orders->Users->find('list', limit: 200)->all();
         $this->set(compact('order', 'users'));
@@ -267,10 +267,10 @@ class OrdersController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $order = $this->Orders->patchEntity($order, $this->request->getData());
             if ($this->Orders->save($order)) {
-                $this->Flash->success(__('The order has been saved.'));
+                $this->Notification->success(__('The order has been saved.'));
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The order could not be saved. Please, try again.'));
+            $this->Notification->error(__('The order could not be saved. Please, try again.'));
         }
         $users = $this->Orders->Users->find('list', limit: 200)->all();
         $this->set(compact('order', 'users'));
@@ -290,9 +290,9 @@ class OrdersController extends AppController
         // If dependent => true was set on OrderItems, deleting this order
         // would automatically delete its items.
         if ($this->Orders->delete($order)) {
-            $this->Flash->success(__('The order has been deleted.'));
+            $this->Notification->success(__('The order has been deleted.'));
         } else {
-            $this->Flash->error(__('The order could not be deleted. Please, try again.'));
+            $this->Notification->error(__('The order could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

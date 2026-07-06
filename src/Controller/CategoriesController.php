@@ -63,11 +63,11 @@ class CategoriesController extends AppController
         if ($this->request->is('post')) {
             $category = $this->Categories->patchEntity($category, $this->request->getData());
             if ($this->Categories->save($category)) {
-                $this->Flash->success(__('The category has been saved.'));
+                $this->Notification->success(__('The category has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The category could not be saved. Please, try again.'));
+            $this->Notification->error(__('The category could not be saved. Please, try again.'));
         }
         $this->set(compact('category'));
     }
@@ -86,11 +86,11 @@ class CategoriesController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $category = $this->Categories->patchEntity($category, $this->request->getData());
             if ($this->Categories->save($category)) {
-                $this->Flash->success(__('The category has been saved.'));
+                $this->Notification->success(__('The category has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The category could not be saved. Please, try again.'));
+            $this->Notification->error(__('The category could not be saved. Please, try again.'));
         }
         $this->set(compact('category'));
     }
@@ -108,9 +108,9 @@ class CategoriesController extends AppController
         $category = $this->Categories->get($id);
         $this->Authorization->authorize($category);
         if ($this->Categories->delete($category)) {
-            $this->Flash->success(__('The category has been deleted.'));
+            $this->Notification->success(__('The category has been deleted.'));
         } else {
-            $this->Flash->error(__('The category could not be deleted. Please, try again.'));
+            $this->Notification->error(__('The category could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

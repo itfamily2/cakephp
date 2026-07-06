@@ -63,11 +63,11 @@ class BrandsController extends AppController
         if ($this->request->is('post')) {
             $brand = $this->Brands->patchEntity($brand, $this->request->getData());
             if ($this->Brands->save($brand)) {
-                $this->Flash->success(__('The brand has been saved.'));
+                $this->Notification->success(__('The brand has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The brand could not be saved. Please, try again.'));
+            $this->Notification->error(__('The brand could not be saved. Please, try again.'));
         }
         $this->set(compact('brand'));
     }
@@ -86,11 +86,11 @@ class BrandsController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $brand = $this->Brands->patchEntity($brand, $this->request->getData());
             if ($this->Brands->save($brand)) {
-                $this->Flash->success(__('The brand has been saved.'));
+                $this->Notification->success(__('The brand has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The brand could not be saved. Please, try again.'));
+            $this->Notification->error(__('The brand could not be saved. Please, try again.'));
         }
         $this->set(compact('brand'));
     }
@@ -108,9 +108,9 @@ class BrandsController extends AppController
         $brand = $this->Brands->get($id);
         $this->Authorization->authorize($brand);
         if ($this->Brands->delete($brand)) {
-            $this->Flash->success(__('The brand has been deleted.'));
+            $this->Notification->success(__('The brand has been deleted.'));
         } else {
-            $this->Flash->error(__('The brand could not be deleted. Please, try again.'));
+            $this->Notification->error(__('The brand could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);
