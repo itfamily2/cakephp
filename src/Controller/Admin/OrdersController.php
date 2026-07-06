@@ -35,7 +35,7 @@ class OrdersController extends AppController
      *
      * URL: GET /admin/orders
      */
-    public function index(): void
+    public function index(): ?\Cake\Http\Response
     {
         $ordersTable = $this->fetchTable('Orders');
 
@@ -89,7 +89,7 @@ class OrdersController extends AppController
      *
      * @param int|null $id Order ID from URL parameter /admin/orders/{id}
      */
-    public function view(?int $id = null): void
+    public function view(?int $id = null): ?\Cake\Http\Response
     {
         // 1. Load order with ALL related data for the admin detail view
         $order = $this->fetchTable('Orders')->get($id, contain: [
@@ -107,7 +107,7 @@ class OrdersController extends AppController
      * URL: POST /admin/orders/{id}/update-status
      * @param int|null $id Order ID
      */
-    public function updateStatus(?int $id = null): void
+    public function updateStatus(?int $id = null): ?\Cake\Http\Response
     {
         $this->request->allowMethod(['post', 'put']);
 
@@ -134,7 +134,7 @@ class OrdersController extends AppController
      * URL: DELETE /admin/orders/{id}
      * @param int|null $id Order ID
      */
-    public function delete(?int $id = null): void
+    public function delete(?int $id = null): ?\Cake\Http\Response
     {
         $this->request->allowMethod(['post', 'delete']);
 

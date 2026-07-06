@@ -23,7 +23,7 @@ class ActivityComponent extends Component
      * @param int|null $userId User ID, if null attempts to get from Auth
      * @return bool True if saved, false otherwise
      */
-    public function log(string $action, string $description, ?int $userId = null): bool
+    public function logActivity(string $action, string $description, ?int $userId = null): bool
     {
         try {
             if ($userId === null) {

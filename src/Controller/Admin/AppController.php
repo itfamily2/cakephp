@@ -58,7 +58,7 @@ class AppController extends BaseAppController
      *
      * @param \Cake\Event\EventInterface $event
      */
-    public function beforeFilter(\Cake\Event\EventInterface $event): void
+    public function beforeFilter(\Cake\Event\EventInterface $event): ?\Cake\Http\Response
     {
         // 1. Run parent beforeFilter (handles authentication redirect)
         parent::beforeFilter($event);

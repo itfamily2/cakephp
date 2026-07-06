@@ -40,7 +40,7 @@ class UsersController extends AppController
      *
      * URL: GET /admin/users
      */
-    public function index(): void
+    public function index(): ?\Cake\Http\Response
     {
         // 1. Load the Users table via TableRegistry (or via $this->Users if loaded)
         $usersTable = $this->fetchTable('Users');
@@ -88,7 +88,7 @@ class UsersController extends AppController
      * URL: GET /admin/users/{id}
      * @param int|null $id User ID from URL parameter
      */
-    public function view(?int $id = null): void
+    public function view(?int $id = null): ?\Cake\Http\Response
     {
         // 1. Load user with all associated data for admin view
         $user = $this->fetchTable('Users')->get($id, contain: [
@@ -105,7 +105,7 @@ class UsersController extends AppController
      *
      * URL: POST /admin/users
      */
-    public function add(): void
+    public function add(): ?\Cake\Http\Response
     {
         $usersTable = $this->fetchTable('Users');
         $user = $usersTable->newEmptyEntity();
@@ -138,7 +138,7 @@ class UsersController extends AppController
      * URL: POST /admin/users/{id}
      * @param int|null $id User ID
      */
-    public function edit(?int $id = null): void
+    public function edit(?int $id = null): ?\Cake\Http\Response
     {
         $usersTable = $this->fetchTable('Users');
         $user = $usersTable->get($id, contain: []);
@@ -169,7 +169,7 @@ class UsersController extends AppController
      * URL: DELETE /admin/users/{id}
      * @param int|null $id User ID
      */
-    public function delete(?int $id = null): void
+    public function delete(?int $id = null): ?\Cake\Http\Response
     {
         $this->request->allowMethod(['post', 'delete']);
 
@@ -191,7 +191,7 @@ class UsersController extends AppController
      * URL: POST /admin/users/toggle-active/{id}
      * @param int|null $id User ID
      */
-    public function toggleActive(?int $id = null): void
+    public function toggleActive(?int $id = null): ?\Cake\Http\Response
     {
         $this->request->allowMethod(['post']);
 

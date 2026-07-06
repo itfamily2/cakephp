@@ -159,7 +159,7 @@ class UsersController extends AppController
             $this->Users->save($user);
 
             // Log activity
-            $this->Activity->log('Login', 'Logged in via Form.');
+            $this->Activity->logActivity('Login', 'Logged in via Form.');
             $this->clearDashboardCache();
 
             $redirect = $this->request->getQuery('redirect', '/');
@@ -198,7 +198,7 @@ class UsersController extends AppController
         $identity = $this->Authentication->getIdentity();
         if ($identity) {
             $user = $identity->getOriginalData();
-            $this->Activity->log('Logout', 'Logged out from session.');
+            $this->Activity->logActivity('Logout', 'Logged out from session.');
         }
 
         $this->Authentication->logout();
@@ -237,7 +237,7 @@ class UsersController extends AppController
                 $groupUser->group_id = 1;
                 $groupUsersTable->save($groupUser);
 
-                $this->Activity->log('Register', 'Registered new account.');
+                $this->Activity->logActivity('Register', 'Registered new account.');
                 $this->clearDashboardCache();
 
                 // Log email queue registration
@@ -319,7 +319,7 @@ class UsersController extends AppController
         $user->email_verified = true;
         $user->verification_token = null;
         if ($this->Users->save($user)) {
-            $this->Activity->log('Verify Email', 'Email address verified successfully.');
+            $this->Activity->logActivity('Verify Email', 'Email address verified successfully.');
             $this->clearDashboardCache();
             $this->Notification->success(__('Email verified successfully. You can now log in.'));
         } else {
@@ -351,7 +351,7 @@ class UsersController extends AppController
                     \Cake\Routing\Router::url(['action' => 'resetPassword', $user->password_reset_token], true)
                 );
 
-                $this->Activity->log('Forgot Password', 'Requested password reset.');
+                $this->Activity->logActivity('Forgot Password', 'Requested password reset.');
             }
 
             $this->Notification->success(__('If the email exists, a password reset link has been sent.'));
@@ -388,7 +388,7 @@ class UsersController extends AppController
             $user->password_reset_expiry = null;
             
             if ($this->Users->save($user)) {
-                $this->Activity->log('Reset Password', 'Password reset successfully.');
+                $this->Activity->logActivity('Reset Password', 'Password reset successfully.');
                 $this->Notification->success(__('Password reset successfully. You can now log in.'));
                 return $this->redirect(['action' => 'login']);
             }
@@ -449,7 +449,7 @@ class UsersController extends AppController
         $user->last_login_ip = $this->request->clientIp();
         $this->Users->save($user);
 
-        $this->Activity->log('Social Login', 'Logged in via ' . ucfirst($provider));
+        $this->Activity->logActivity('Social Login', 'Logged in via ' . ucfirst($provider));
 
         if ($isNew) {
             // Requirement: "We can show Change Password page after registration using social account"
@@ -492,7 +492,7 @@ class UsersController extends AppController
 
             $user = $this->Users->patchEntity($user, $data);
             if ($this->Users->save($user)) {
-                $this->Activity->log('Update Profile', 'Updated profile information.');
+                $this->Activity->logActivity('Update Profile', 'Updated profile information.');
                 $this->Notification->success(__('Profile updated successfully.'));
                 return $this->redirect(['action' => 'profile']);
             }
@@ -524,7 +524,7 @@ class UsersController extends AppController
                 ]);
                 
                 if ($this->Users->save($user)) {
-                    $this->Activity->log('Change Password', 'Changed password successfully.');
+                    $this->Activity->logActivity('Change Password', 'Changed password successfully.');
                     $this->Notification->success(__('Password changed successfully.'));
                     return $this->redirect(['action' => 'profile']);
                 }
@@ -633,7 +633,7 @@ class UsersController extends AppController
                     $groupUsersTable->save($groupUser);
                 }
 
-                $this->Activity->log('Admin Add User', 'Admin created user ' . $user->username);
+                $this->Activity->logActivity('Admin Add User', 'Admin created user ' . $user->username);
                 $this->clearDashboardCache();
                 $this->Notification->success(__('User added successfully.'));
                 return $this->redirect(['action' => 'index']);
@@ -684,7 +684,7 @@ class UsersController extends AppController
                     $groupUsersTable->save($groupUser);
                 }
 
-                $this->Activity->log('Admin Edit User', 'Admin updated user configuration.');
+                $this->Activity->logActivity('Admin Edit User', 'Admin updated user configuration.');
                 $this->clearDashboardCache();
                 $this->Notification->success(__('User updated successfully.'));
                 return $this->redirect(['action' => 'index']);
@@ -731,7 +731,7 @@ class UsersController extends AppController
         
         if ($this->Users->save($user)) {
             $status = $user->is_active ? 'activated' : 'deactivated';
-            $this->Activity->log('Admin Toggle Status', 'Admin ' . $status . ' user account.');
+            $this->Activity->logActivity('Admin Toggle Status', 'Admin ' . $status . ' user account.');
             $this->clearDashboardCache();
             $this->Notification->success(__('User has been ' . $status . '.'));
         } else {
@@ -765,7 +765,7 @@ class UsersController extends AppController
             if ($inactivate === '1') {
                 $msg = 'User logged out and account deactivated.';
             }
-            $this->Activity->log('Admin Force Logout', 'Admin force logged out this user.');
+            $this->Activity->logActivity('Admin Force Logout', 'Admin force logged out this user.');
             $this->clearDashboardCache();
             $this->Notification->success(__($msg));
         } else {

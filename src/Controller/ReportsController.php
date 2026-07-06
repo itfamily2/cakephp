@@ -40,7 +40,7 @@ class ReportsController extends AppController
     /**
      * beforeFilter() — Validate date range parameters for all report actions
      */
-    public function beforeFilter(\Cake\Event\EventInterface $event): void
+    public function beforeFilter(\Cake\Event\EventInterface $event): ?\Cake\Http\Response
     {
         parent::beforeFilter($event);
 
@@ -75,7 +75,7 @@ class ReportsController extends AppController
      * index() — Report dashboard with summary KPIs
      * URL: GET /reports
      */
-    public function index(): void
+    public function index(): ?\Cake\Http\Response
     {
         $this->Authorization->skipAuthorization();
 
@@ -176,7 +176,7 @@ class ReportsController extends AppController
      * PHASE 4: Download response
      * Returns raw CSV content with download headers instead of rendering HTML.
      */
-    public function exportCsv(): void
+    public function exportCsv(): ?\Cake\Http\Response
     {
         $this->Authorization->skipAuthorization();
 
@@ -225,7 +225,7 @@ class ReportsController extends AppController
      *
      * PHASE 4: AJAX + JSON pattern
      */
-    public function chartData(): void
+    public function chartData(): ?\Cake\Http\Response
     {
         $this->Authorization->skipAuthorization();
 

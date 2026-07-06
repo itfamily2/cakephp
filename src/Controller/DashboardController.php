@@ -68,7 +68,7 @@ class DashboardController extends AppController
      *   - Multiple table lookups via fetchTable()
      *   - beforeRender() injects $currentUser to layout
      */
-    public function index(): void
+    public function index(): ?\Cake\Http\Response
     {
         // Skip authorization — all logged-in users can see the dashboard
         $this->Authorization->skipAuthorization();
@@ -168,7 +168,7 @@ class DashboardController extends AppController
      *
      * PHASE 4: JSON response pattern
      */
-    public function liveStats(): void
+    public function liveStats(): ?\Cake\Http\Response
     {
         $this->Authorization->skipAuthorization();
 
@@ -193,7 +193,7 @@ class DashboardController extends AppController
      *
      * PHASE 4: redirect() pattern + Flash component usage
      */
-    public function clearCache(): void
+    public function clearCache(): ?\Cake\Http\Response
     {
         $this->Authorization->skipAuthorization();
 

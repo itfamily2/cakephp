@@ -111,6 +111,24 @@ return [
             'duration' => '+10 minutes',
             'prefix' => 'cake_redis_',
         ],
+        'apcu' => [
+            'className' => 'Cake\Cache\Engine\ApcuEngine',
+            'prefix' => 'cake_apcu_',
+            'duration' => '+1 hour',
+        ],
+        'memcached' => [
+            'className' => 'Cake\Cache\Engine\MemcachedEngine',
+            'prefix' => 'cake_memcached_',
+            'servers' => ['127.0.0.1'],
+            'duration' => '+1 hour',
+        ],
+        '_cake_routes_' => [
+            'className' => FileEngine::class,
+            'prefix' => 'myapp_cake_routes_',
+            'path' => CACHE,
+            'serialize' => true,
+            'duration' => '+1 years',
+        ],
 
         /*
          * Configure the cache used for general framework caching.
