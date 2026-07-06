@@ -130,9 +130,15 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             ->add(new AuthorizationMiddleware($this))
 
             // =================================================================
-            // PHASE 9: Custom Middlewares
+            // PHASE 19: Security Middlewares
             // =================================================================
             
+            // Force HTTPS in production
+            ->add(new \App\Middleware\ForceHttpsMiddleware())
+            
+            // Hardened Security Headers (CSP, XSS, HSTS)
+            ->add(new \App\Middleware\SecurityHeadersMiddleware())
+
             // 1. Maintenance Mode (check early)
             ->add(new \App\Middleware\MaintenanceModeMiddleware())
             
@@ -156,12 +162,25 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
 
     public function getAuthenticationService(ServerRequestInterface $request): AuthenticationServiceInterface
     {
+        $path = $request->getUri()->getPath();
+        $isApi = str_starts_with($path, '/api');
+
         $authenticationService = new AuthenticationService([
-            'unauthenticatedRedirect' => '/users/login',
+            'unauthenticatedRedirect' => $isApi ? null : '/users/login',
             'queryParam' => 'redirect',
         ]);
 
         // Load authenticators
+        if ($isApi) {
+            // PHASE 16: JWT Authentication
+            $authenticationService->loadAuthenticator('Authentication.Jwt', [
+                'secretKey' => \Cake\Utility\Security::getSalt(),
+                'algorithm' => 'HS256',
+                'returnPayload' => false
+            ]);
+            $authenticationService->loadIdentifier('Authentication.JwtSubject');
+        }
+
         $authenticationService->loadAuthenticator('Authentication.Session');
         
         $authenticationService->loadAuthenticator('Authentication.Form', [

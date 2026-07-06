@@ -163,11 +163,28 @@ class UsersController extends AppController
             $this->clearDashboardCache();
 
             $redirect = $this->request->getQuery('redirect', '/');
+            
+            // PHASE 15: AJAX Login Success
+            if ($this->request->is('json') || $this->request->is('ajax')) {
+                $this->set(['success' => true, 'redirect' => $redirect]);
+                $this->viewBuilder()->setClassName('Json');
+                $this->viewBuilder()->setOption('serialize', ['success', 'redirect']);
+                return;
+            }
+            
             return $this->redirect($redirect);
         }
 
         if ($this->request->is('post')) {
             $this->Notification->error(__('Invalid username or password.'));
+            
+            // PHASE 15: AJAX Login Error
+            if ($this->request->is('json') || $this->request->is('ajax')) {
+                $this->set(['success' => false, 'message' => __('Invalid username or password.')]);
+                $this->viewBuilder()->setClassName('Json');
+                $this->viewBuilder()->setOption('serialize', ['success', 'message']);
+                return;
+            }
         }
     }
 
@@ -232,11 +249,54 @@ class UsersController extends AppController
                 );
 
                 $this->Notification->success(__('Registration successful. Please check your email to verify your account.'));
+                
+                // PHASE 15: AJAX Register Success
+                if ($this->request->is('json') || $this->request->is('ajax')) {
+                    $this->set('success', true);
+                    $this->viewBuilder()->setClassName('Json');
+                    $this->viewBuilder()->setOption('serialize', ['success']);
+                    return;
+                }
+                
                 return $this->redirect(['action' => 'login']);
             }
             $this->Notification->error(__('Registration failed. Please review the errors below.'));
+            
+            // PHASE 15: AJAX Register Validation Errors
+            if ($this->request->is('json') || $this->request->is('ajax')) {
+                $this->set('success', false);
+                $this->set('errors', $user->getErrors());
+                $this->viewBuilder()->setClassName('Json');
+                $this->viewBuilder()->setOption('serialize', ['success', 'errors']);
+                return;
+            }
         }
         $this->set(compact('user'));
+    }
+
+    /**
+     * notifications() — Phase 15: AJAX Polling
+     * URL: /users/notifications
+     */
+    public function notifications()
+    {
+        $this->Authorization->skipAuthorization();
+        
+        $identity = $this->Authentication->getIdentity();
+        $notifications = [];
+        
+        if ($identity) {
+            $this->loadModel('ActivityLogs');
+            $notifications = $this->ActivityLogs->find()
+                ->select(['id', 'action', 'description', 'created'])
+                ->order(['created' => 'DESC'])
+                ->limit(5)
+                ->toArray();
+        }
+        
+        $this->set(compact('notifications'));
+        $this->viewBuilder()->setClassName('Json');
+        $this->viewBuilder()->setOption('serialize', ['notifications']);
     }
 
     /**

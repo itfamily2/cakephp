@@ -274,6 +274,17 @@ return function (RouteBuilder $routes): void {
     // This allows CakePHP to detect URLs like /reports/export-data.json
     // and automatically set the _ext request parameter.
     $builder->setExtensions(['json', 'xml', 'csv', 'pdf']);
+    
+    // =========================================================================
+    // PHASE 16: API Routing (Versioning) - nested inside main scope
+    // =========================================================================
+    $builder->scope('/api/v1', ['prefix' => 'Api/V1'], function (\Cake\Routing\RouteBuilder $b) {
+        $b->setExtensions(['json']);
+        $b->resources('Products');
+        $b->resources('Orders');
+        $b->connect('/users/token', ['controller' => 'Users', 'action' => 'token']);
+        $b->fallbacks();
+    });
 
         $builder->connect('/login',    ['controller' => 'Users', 'action' => 'login'],    ['_name' => 'login']);
         $builder->connect('/logout',   ['controller' => 'Users', 'action' => 'logout'],   ['_name' => 'logout']);

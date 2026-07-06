@@ -52,12 +52,35 @@ class ProductsController extends AppController
         }
 
         $products = $this->paginate($query);
-        $this->set(compact('products'));
         
-        if ($this->request->is('json')) {
+        // Add Pagination metadata for frontend
+        $paging = $this->request->getAttribute('paging');
+        
+        $this->set(compact('products', 'paging'));
+        
+        if ($this->request->is('json') || $this->request->is('ajax')) {
             $this->viewBuilder()->setClassName('Json');
-            $this->viewBuilder()->setOption('serialize', ['products']);
+            $this->viewBuilder()->setOption('serialize', ['products', 'paging']);
         }
+    }
+
+    /**
+     * autocomplete() — Phase 15: AJAX Autocomplete
+     * URL: /products/autocomplete?term=xyz
+     */
+    public function autocomplete()
+    {
+        $this->request->allowMethod(['get']);
+        $term = $this->request->getQuery('term', '');
+        
+        $query = $this->Products->find()
+            ->select(['id', 'name'])
+            ->where(['name LIKE' => "%$term%"])
+            ->limit(10);
+            
+        $this->set('suggestions', $query->toArray());
+        $this->viewBuilder()->setClassName('Json');
+        $this->viewBuilder()->setOption('serialize', ['suggestions']);
     }
 
     /**
@@ -173,9 +196,28 @@ class ProductsController extends AppController
 
             if ($this->Products->save($product)) {
                 $this->Notification->success(__('The product has been saved.'));
+                
+                // PHASE 15: AJAX CRUD Response
+                if ($this->request->is('json') || $this->request->is('ajax')) {
+                    $this->set('success', true);
+                    $this->set('product', $product);
+                    $this->viewBuilder()->setClassName('Json');
+                    $this->viewBuilder()->setOption('serialize', ['success', 'product']);
+                    return;
+                }
+                
                 return $this->redirect(['action' => 'index']);
             }
             $this->Notification->error(__('The product could not be saved. Please, try again.'));
+            
+            // PHASE 15: AJAX Validation Errors
+            if ($this->request->is('json') || $this->request->is('ajax')) {
+                $this->set('success', false);
+                $this->set('errors', $product->getErrors());
+                $this->viewBuilder()->setClassName('Json');
+                $this->viewBuilder()->setOption('serialize', ['success', 'errors']);
+                return;
+            }
         }
 
         // Phase 6: Query Builder — Fetch lists for dropdowns
@@ -202,9 +244,27 @@ class ProductsController extends AppController
 
             if ($this->Products->save($product)) {
                 $this->Notification->success(__('The product has been updated.'));
+                
+                // PHASE 15: AJAX CRUD Update
+                if ($this->request->is('json') || $this->request->is('ajax')) {
+                    $this->set('success', true);
+                    $this->set('product', $product);
+                    $this->viewBuilder()->setClassName('Json');
+                    $this->viewBuilder()->setOption('serialize', ['success', 'product']);
+                    return;
+                }
+                
                 return $this->redirect(['action' => 'index']);
             }
             $this->Notification->error(__('The product could not be updated. Please, try again.'));
+            
+            if ($this->request->is('json') || $this->request->is('ajax')) {
+                $this->set('success', false);
+                $this->set('errors', $product->getErrors());
+                $this->viewBuilder()->setClassName('Json');
+                $this->viewBuilder()->setOption('serialize', ['success', 'errors']);
+                return;
+            }
         }
 
         $categories = $this->Products->Categories->find('list', limit: 200)->all();
@@ -226,11 +286,21 @@ class ProductsController extends AppController
         // PHASE 6: delete() triggers Model.beforeDelete.
         // Because we attached SoftDeleteBehavior to the ProductsTable,
         // this will NOT execute a DELETE statement. It will execute an UPDATE
-        // setting deleted_at = NOW() and block the real deletion.
+        $success = false;
+        
         if ($this->Products->delete($product)) {
-            $this->Notification->success(__('The product has been deleted (soft deleted).'));
+            $success = true;
+            $this->Notification->success(__('The product has been deleted.'));
         } else {
-            $this->Notification->error(__('The product could not be deleted. Please, try again.'));
+            $this->Notification->error(__('The product could not be deleted.'));
+        }
+
+        // PHASE 15: AJAX Delete Response
+        if ($this->request->is('json') || $this->request->is('ajax')) {
+            $this->set(compact('success'));
+            $this->viewBuilder()->setClassName('Json');
+            $this->viewBuilder()->setOption('serialize', ['success']);
+            return;
         }
 
         return $this->redirect(['action' => 'index']);
