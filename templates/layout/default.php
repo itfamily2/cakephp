@@ -12,7 +12,7 @@ $currentUser = $currentUser ?? null;
     <?= $this->Html->meta('icon') ?>
 
     <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
     
     <!-- Bootstrap 5 CSS -->
@@ -144,7 +144,7 @@ $currentUser = $currentUser ?? null;
                             <?php endif; ?>
                             <span><?= h($currentUser->username) ?></span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end mt-2">
+                        <ul class="dropdown-menu dropdown-menu-end mt-2 shadow">
                             <li><a class="dropdown-item" href="<?= $this->Url->build('/users/profile') ?>"><i class="fa-regular fa-user me-2"></i>My Profile</a></li>
                             <li><a class="dropdown-item" href="<?= $this->Url->build('/users/change-password') ?>"><i class="fa-solid fa-key me-2"></i>Change Password</a></li>
                             <li><hr class="dropdown-divider"></li>
@@ -164,8 +164,8 @@ $currentUser = $currentUser ?? null;
         <div class="container d-flex align-items-center justify-content-center min-vh-100">
             <div class="w-100" style="max-width: 450px;">
                 <div class="text-center mb-4">
-                    <h2 class="fw-bold text-white"><span class="text-primary"><i class="fa-solid fa-layer-group me-2"></i></span>Enterprise</h2>
-                    <p class="text-muted">User Management & Control Panel</p>
+                    <h2 class="fw-bold text-dark"><span class="text-primary"><i class="fa-solid fa-layer-group me-2"></i></span>Enterprise</h2>
+                    <p class="text-muted">User Management &amp; Control Panel</p>
                 </div>
                 <?= $this->Flash->render() ?>
                 <?= $this->fetch('content') ?>
@@ -182,8 +182,8 @@ $currentUser = $currentUser ?? null;
                     text: "This will clear all application caches in one click.",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#6366f1',
-                    cancelButtonColor: '#64748b',
+                    confirmButtonColor: '#0078d4',
+                    cancelButtonColor: '#6c757d',
                     confirmButtonText: 'Yes, clear it!'
                 }).then((result) => {
                     if (result.isConfirmed) {

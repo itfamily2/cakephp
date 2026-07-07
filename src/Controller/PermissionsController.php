@@ -71,11 +71,10 @@ class PermissionsController extends AppController
     // I use it to check if the user is logged in, verify their role,
     // and abort the request early with a redirect if they don't qualify."
     // =========================================================================
-    public function beforeFilter(\Cake\Event\EventInterface $event): void
+    public function beforeFilter(\Cake\Event\EventInterface $event): ?\Cake\Http\Response
     {
         parent::beforeFilter($event);
-        // All permissions actions require authentication — handled by AppController
-        // No public actions to whitelist here
+        return null;
     }
 
 
@@ -144,6 +143,7 @@ class PermissionsController extends AppController
         }
 
         $this->set(compact('permissions', 'search', 'roleFilter'));
+        return null;
     }
 
 
@@ -184,6 +184,7 @@ class PermissionsController extends AppController
 
         // Pass entity to view so the form shows validation errors
         $this->set(compact('permission'));
+        return null;
     }
 
 
@@ -220,6 +221,7 @@ class PermissionsController extends AppController
         }
 
         $this->set(compact('permission'));
+        return null;
     }
 
 
@@ -290,7 +292,7 @@ class PermissionsController extends AppController
             ->withStringBody($csv);
 
         // 4. Return the Response — do NOT render a view
-        return $this->send($response);
+        return $response;
     }
 
 
@@ -444,7 +446,7 @@ class PermissionsController extends AppController
                 ->withType('application/json')
                 ->withStringBody(json_encode($data));
 
-            return $this->send($response);
+            return $response;
         }
 
         $this->Notification->error(__('This endpoint only accepts AJAX requests.'));

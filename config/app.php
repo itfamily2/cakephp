@@ -112,14 +112,15 @@ return [
             'prefix' => 'cake_redis_',
         ],
         'apcu' => [
-            'className' => 'Cake\Cache\Engine\ApcuEngine',
+            'className' => extension_loaded('apcu') ? 'Cake\Cache\Engine\ApcuEngine' : FileEngine::class,
             'prefix' => 'cake_apcu_',
+            'path' => CACHE,
             'duration' => '+1 hour',
         ],
         'memcached' => [
-            'className' => 'Cake\Cache\Engine\MemcachedEngine',
+            'className' => extension_loaded('memcached') ? 'Cake\Cache\Engine\MemcachedEngine' : FileEngine::class,
             'prefix' => 'cake_memcached_',
-            'servers' => ['127.0.0.1'],
+            'path' => CACHE,
             'duration' => '+1 hour',
         ],
         '_cake_routes_' => [

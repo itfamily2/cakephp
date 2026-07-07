@@ -26,16 +26,16 @@ class SecurityHeadersMiddleware implements MiddlewareInterface
     {
         $response = $handler->handle($request);
 
-        // Content-Security-Policy: whitelist known trusted sources only
+        // Content-Security-Policy: allow required CDN resources for Bootstrap, FA, jQuery, Chart.js
         $csp = implode('; ', [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' cdn.jsdelivr.net",    // Allow Chart.js CDN
-            "style-src 'self' 'unsafe-inline' fonts.googleapis.com",
-            "img-src 'self' data: *.googleapis.com",
-            "font-src 'self' fonts.gstatic.com",
-            "connect-src 'self'",
-            "frame-ancestors 'none'",   // Equivalent to X-Frame-Options: DENY
-            "form-action 'self'",       // Forms may only POST to own domain
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net code.jquery.com cdnjs.cloudflare.com",
+            "style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net cdnjs.cloudflare.com",
+            "img-src 'self' data: blob: *.googleapis.com *.gstatic.com",
+            "font-src 'self' fonts.gstatic.com cdnjs.cloudflare.com",
+            "connect-src 'self' cdn.jsdelivr.net",
+            "frame-ancestors 'none'",
+            "form-action 'self'",
         ]);
 
         return $response

@@ -50,10 +50,10 @@ class ReportsController extends AppController
 
         if ($from && $to && strtotime($from) > strtotime($to)) {
             $this->Flash->error(__('Start date cannot be after end date.'));
-            // Stop the action from running by redirecting
             $event->stopPropagation();
             return $this->redirect(['action' => 'index']);
         }
+        return null;
     }
 
     /**
@@ -116,6 +116,8 @@ class ReportsController extends AppController
             ->toArray();
 
         $this->set(compact('totalRevenue', 'ordersByStatus', 'newUsers', 'topProducts', 'from', 'to'));
+        
+        return null;
     }
 
     /**
@@ -214,7 +216,7 @@ class ReportsController extends AppController
             ->withStringBody($csv);     // Sets response body
 
         // Return the response directly — bypasses view rendering
-        return $this->send($response);
+        return $response;
     }
 
     /**
@@ -235,7 +237,7 @@ class ReportsController extends AppController
                 ->withStatus(403)
                 ->withType('application/json')
                 ->withStringBody(json_encode(['error' => 'AJAX only']));
-            return $this->send($response);
+            return $response;
         }
 
         // Get daily order counts for last 30 days
@@ -254,6 +256,6 @@ class ReportsController extends AppController
             ->withType('application/json')
             ->withStringBody(json_encode(['chartData' => $data]));
 
-        return $this->send($response);
+        return $response;
     }
 }

@@ -592,13 +592,14 @@ class UsersController extends AppController
             'order' => ['Users.created' => 'DESC']
         ]);
 
+        // Always set data first so both full-page and AJAX partial renders have it
+        $this->set(compact('users', 'search', 'status'));
+
         // If AJAX request, render the ajax-table partial instead of the whole layout!
         if ($this->request->is('ajax')) {
             $this->viewBuilder()->setLayout('ajax');
             return $this->render('ajax_index');
         }
-
-        $this->set(compact('users', 'search', 'status'));
     }
 
     /**
@@ -644,6 +645,33 @@ class UsersController extends AppController
         $roles = TableRegistry::getTableLocator()->get('Roles')->find('list')->all();
         $groups = TableRegistry::getTableLocator()->get('Groups')->find('list')->all();
         $this->set(compact('user', 'roles', 'groups'));
+    }
+
+    /**
+     * View user profile
+     */
+    public function view($id = null)
+    {
+        $user = $this->Users->get($id, [
+            'contain' => ['UserRoles', 'GroupUsers', 'UserRoles.Roles', 'GroupUsers.Groups']
+        ]);
+        
+        $roleIds = array_filter(array_map(function($ur) { return $ur->role_id; }, $user->user_roles ?? []));
+        $groupIds = array_filter(array_map(function($gu) { return $gu->group_id; }, $user->group_users ?? []));
+        
+        $permissions = [];
+        if (!empty($roleIds) || !empty($groupIds)) {
+            $conditions = [];
+            if (!empty($roleIds)) $conditions['role_id IN'] = $roleIds;
+            if (!empty($groupIds)) $conditions['group_id IN'] = $groupIds;
+            
+            $permissions = \Cake\ORM\TableRegistry::getTableLocator()->get('Permissions')
+                ->find()
+                ->where(['OR' => $conditions])
+                ->all();
+        }
+        
+        $this->set(compact('user', 'permissions'));
     }
 
     /**

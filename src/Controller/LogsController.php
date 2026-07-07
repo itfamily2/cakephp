@@ -3,11 +3,12 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use Cake\Filesystem\Folder;
-use Cake\Filesystem\File;
 use Cake\Http\Exception\NotFoundException;
-use Cake\Http\Response;
 
+/**
+ * LogsController — CakePHP 5 compatible (no deprecated Cake\Filesystem\Folder)
+ * Uses native PHP filesystem functions instead.
+ */
 class LogsController extends AppController
 {
     private string $logPath;
@@ -18,32 +19,32 @@ class LogsController extends AppController
         $this->logPath = LOGS;
     }
 
-    /**
-     * List all log files
-     */
-    public function index()
+    public function index(): void
     {
-        $folder = new Folder($this->logPath);
-        $files = $folder->find('.*\.log');
-        
+        $this->Authorization->skipAuthorization();
+
         $logFiles = [];
-        foreach ($files as $fileName) {
-            $file = new File($this->logPath . $fileName);
-            $logFiles[] = [
-                'name' => $fileName,
-                'size' => $file->size(),
-                'modified' => $file->lastChange(),
-            ];
+        if (is_dir($this->logPath)) {
+            foreach (glob($this->logPath . '*.log') as $filePath) {
+                $fileName = basename($filePath);
+                $logFiles[] = [
+                    'name'     => $fileName,
+                    'size'     => filesize($filePath),
+                    'modified' => filemtime($filePath),
+                    'lines'    => count(file($filePath)),
+                ];
+            }
         }
+
+        // Sort by modified time, newest first
+        usort($logFiles, fn($a, $b) => $b['modified'] <=> $a['modified']);
 
         $this->set(compact('logFiles'));
     }
 
-    /**
-     * View/Edit a particular log file
-     */
-    public function view(string $fileName)
+    public function view(string $fileName): ?\Cake\Http\Response
     {
+        $this->Authorization->skipAuthorization();
         $fileName = basename($fileName);
         $filePath = $this->logPath . $fileName;
 
@@ -52,41 +53,29 @@ class LogsController extends AppController
             return $this->redirect(['action' => 'index']);
         }
 
-        $file = new File($filePath);
-        
-        if ($this->request->is(['post', 'put'])) {
-            $content = $this->request->getData('content');
-            if ($file->write($content)) {
-                $this->Notification->success(__('Log file updated successfully.'));
-                return $this->redirect(['action' => 'view', $fileName]);
-            }
-            $this->Notification->error(__('Failed to update log file.'));
-        }
+        // Get last 200 lines for display
+        $allLines = file($filePath, FILE_IGNORE_NEW_LINES);
+        $content  = implode(PHP_EOL, array_slice($allLines, -200));
+        $size     = filesize($filePath);
+        $lines    = count($allLines);
 
-        $content = $file->read();
-        $size = $file->size();
-
-        $this->set(compact('fileName', 'content', 'size'));
+        $this->set(compact('fileName', 'content', 'size', 'lines'));
+        return null;
     }
 
-    /**
-     * Create backup of a log file
-     */
-    public function backup(string $fileName)
+    public function backup(string $fileName): ?\Cake\Http\Response
     {
-        $fileName = basename($fileName);
-        $filePath = $this->logPath . $fileName;
+        $fileName   = basename($fileName);
+        $filePath   = $this->logPath . $fileName;
 
         if (!file_exists($filePath)) {
             $this->Notification->error(__('Log file not found.'));
             return $this->redirect(['action' => 'index']);
         }
 
-        $file = new File($filePath);
         $backupName = pathinfo($fileName, PATHINFO_FILENAME) . '_backup_' . date('Ymd_His') . '.log';
-        
-        if ($file->copy($this->logPath . $backupName)) {
-            $this->Notification->success(__('Backup created successfully as {0}.', $backupName));
+        if (copy($filePath, $this->logPath . $backupName)) {
+            $this->Notification->success(__('Backup created: {0}', $backupName));
         } else {
             $this->Notification->error(__('Failed to create backup.'));
         }
@@ -94,10 +83,7 @@ class LogsController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 
-    /**
-     * Empty the log file
-     */
-    public function empty(string $fileName)
+    public function empty(string $fileName): ?\Cake\Http\Response
     {
         $fileName = basename($fileName);
         $filePath = $this->logPath . $fileName;
@@ -107,20 +93,16 @@ class LogsController extends AppController
             return $this->redirect(['action' => 'index']);
         }
 
-        $file = new File($filePath);
-        if ($file->write('')) {
-            $this->Notification->success(__('Log file emptied successfully.'));
+        if (file_put_contents($filePath, '') !== false) {
+            $this->Notification->success(__('Log file cleared.'));
         } else {
-            $this->Notification->error(__('Failed to empty log file.'));
+            $this->Notification->error(__('Failed to clear log file.'));
         }
 
         return $this->redirect(['action' => 'index']);
     }
 
-    /**
-     * Delete a log file
-     */
-    public function delete(string $fileName)
+    public function delete(string $fileName): ?\Cake\Http\Response
     {
         $this->request->allowMethod(['post', 'delete']);
         $fileName = basename($fileName);
@@ -131,9 +113,8 @@ class LogsController extends AppController
             return $this->redirect(['action' => 'index']);
         }
 
-        $file = new File($filePath);
-        if ($file->delete()) {
-            $this->Notification->success(__('Log file deleted successfully.'));
+        if (unlink($filePath)) {
+            $this->Notification->success(__('Log file deleted.'));
         } else {
             $this->Notification->error(__('Failed to delete log file.'));
         }

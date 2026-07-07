@@ -22,7 +22,7 @@ class NotificationComponent extends Component
      */
     public function success(string $message): void
     {
-        $this->Notification->success($message);
+        $this->Flash->success($message);
     }
 
     /**
@@ -30,7 +30,7 @@ class NotificationComponent extends Component
      */
     public function error(string $message): void
     {
-        $this->Notification->error($message);
+        $this->Flash->error($message);
     }
 
     /**
@@ -38,7 +38,7 @@ class NotificationComponent extends Component
      */
     public function warning(string $message): void
     {
-        $this->Notification->warning($message);
+        $this->Flash->warning($message);
     }
     
     /**
@@ -46,7 +46,7 @@ class NotificationComponent extends Component
      */
     public function info(string $message): void
     {
-        $this->Notification->info($message);
+        $this->Flash->info($message);
     }
     
     /**

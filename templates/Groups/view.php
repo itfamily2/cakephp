@@ -1,164 +1,177 @@
-<?php
-/**
- * @var \App\View\AppView $this
- * @var \App\Model\Entity\Group $group
- */
-?>
-<div class="row">
-    <aside class="column">
-        <div class="side-nav">
-            <h4 class="heading"><?= __('Actions') ?></h4>
-            <?= $this->Html->link(__('Edit Group'), ['action' => 'edit', $group->id], ['class' => 'side-nav-item']) ?>
-            <?= $this->Form->postLink(__('Delete Group'), ['action' => 'delete', $group->id], ['confirm' => __('Are you sure you want to delete # {0}?', $group->id), 'class' => 'side-nav-item']) ?>
-            <?= $this->Html->link(__('List Groups'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
-            <?= $this->Html->link(__('New Group'), ['action' => 'add'], ['class' => 'side-nav-item']) ?>
+<?php $this->assign('title', 'View Group: ' . h($group->name)); ?>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <nav aria-label="breadcrumb" class="mb-1">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="<?= $this->Url->build(['action' => 'index']) ?>">Groups</a></li>
+                <li class="breadcrumb-item active"><?= h($group->name) ?></li>
+            </ol>
+        </nav>
+        <h4 class="fw-bold mb-0"><i class="fa-solid fa-users-rectangle text-primary me-2"></i><?= h($group->name) ?></h4>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="<?= $this->Url->build(['action' => 'edit', $group->id]) ?>" class="btn btn-primary">
+            <i class="fa-solid fa-pen me-2"></i>Edit Group
+        </a>
+        <?= $this->Form->postLink(
+            '<i class="fa-solid fa-trash me-1"></i>Delete',
+            ['action' => 'delete', $group->id],
+            ['confirm' => 'Delete this group and all its members?', 'class' => 'btn btn-outline-danger', 'escape' => false]
+        ) ?>
+        <a href="<?= $this->Url->build(['action' => 'index']) ?>" class="btn btn-outline-secondary">
+            <i class="fa-solid fa-arrow-left me-2"></i>Back
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Group Info -->
+    <div class="col-lg-4">
+        <div class="glass-card p-4 mb-4">
+            <div class="text-center mb-3">
+                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                     style="width:80px;height:80px;background:var(--primary-light);">
+                    <i class="fa-solid fa-users-rectangle fa-2x text-primary"></i>
+                </div>
+                <h5 class="fw-bold mb-1"><?= h($group->name) ?></h5>
+                <?php if (!empty($group->parent_group)): ?>
+                    <span class="badge bg-secondary text-muted">
+                        <i class="fa-solid fa-sitemap me-1"></i>Under: <?= h($group->parent_group->name) ?>
+                    </span>
+                <?php else: ?>
+                    <span class="badge bg-primary">
+                        <i class="fa-solid fa-crown me-1"></i>Top-Level Group
+                    </span>
+                <?php endif; ?>
+            </div>
+            <hr>
+            <div class="row g-2 text-center">
+                <div class="col-4">
+                    <div class="fw-bold fs-5 text-primary"><?= count($group->group_users ?? []) ?></div>
+                    <div class="text-muted" style="font-size:0.75rem;">Members</div>
+                </div>
+                <div class="col-4">
+                    <div class="fw-bold fs-5 text-success"><?= count($group->child_groups ?? []) ?></div>
+                    <div class="text-muted" style="font-size:0.75rem;">Sub-Groups</div>
+                </div>
+                <div class="col-4">
+                    <div class="fw-bold fs-5 text-warning"><?= count($group->permissions ?? []) ?></div>
+                    <div class="text-muted" style="font-size:0.75rem;">Permissions</div>
+                </div>
+            </div>
+            <hr>
+            <div class="small">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Created</span>
+                    <span class="fw-semibold"><?= $group->created ? $group->created->format('M d, Y') : '—' ?></span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted">Modified</span>
+                    <span class="fw-semibold"><?= $group->modified ? $group->modified->format('M d, Y') : '—' ?></span>
+                </div>
+            </div>
         </div>
-    </aside>
-    <div class="column column-80">
-        <div class="groups view content">
-            <h3><?= h($group->name) ?></h3>
-            <table>
-                <tr>
-                    <th><?= __('Parent Group') ?></th>
-                    <td><?= $group->hasValue('parent_group') ? $this->Html->link($group->parent_group->name, ['controller' => 'Groups', 'action' => 'view', $group->parent_group->id]) : '' ?></td>
-                </tr>
-                <tr>
-                    <th><?= __('Name') ?></th>
-                    <td><?= h($group->name) ?></td>
-                </tr>
-                <tr>
-                    <th><?= __('Id') ?></th>
-                    <td><?= $this->Number->format($group->id) ?></td>
-                </tr>
-                <tr>
-                    <th><?= __('Created') ?></th>
-                    <td><?= h($group->created) ?></td>
-                </tr>
-                <tr>
-                    <th><?= __('Modified') ?></th>
-                    <td><?= h($group->modified) ?></td>
-                </tr>
-                <tr>
-                    <th><?= __('Registration Allowed') ?></th>
-                    <td><?= $group->registration_allowed ? __('Yes') : __('No'); ?></td>
-                </tr>
-            </table>
-            <div class="related">
-                <h4><?= __('Related Group Users') ?></h4>
-                <?php if (!empty($group->group_users)) : ?>
+
+        <!-- Sub-Groups -->
+        <?php if (!empty($group->child_groups)): ?>
+        <div class="glass-card p-4">
+            <h6 class="fw-bold mb-3"><i class="fa-solid fa-sitemap me-2 text-primary"></i>Sub-Groups</h6>
+            <?php foreach ($group->child_groups as $child): ?>
+                <a href="<?= $this->Url->build(['action' => 'view', $child->id]) ?>"
+                   class="d-flex align-items-center gap-2 p-2 rounded mb-1 text-decoration-none"
+                   style="background:var(--bg-surface-2);border:1px solid var(--border-light);">
+                    <i class="fa-solid fa-users text-primary"></i>
+                    <span class="fw-semibold text-dark small"><?= h($child->name) ?></span>
+                    <i class="fa-solid fa-angle-right ms-auto text-muted"></i>
+                </a>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+    </div>
+
+    <!-- Members + Permissions -->
+    <div class="col-lg-8">
+        <!-- Members -->
+        <div class="glass-card mb-4">
+            <div class="p-4 border-bottom d-flex justify-content-between align-items-center" style="border-color:var(--border-color);">
+                <h6 class="fw-bold mb-0"><i class="fa-solid fa-user-group me-2 text-primary"></i>Members (<?= count($group->group_users ?? []) ?>)</h6>
+            </div>
+            <?php if (empty($group->group_users)): ?>
+                <div class="text-center text-muted py-4 small">
+                    <i class="fa-solid fa-users-slash fa-2x mb-2 d-block opacity-50"></i>
+                    No members in this group.
+                </div>
+            <?php else: ?>
                 <div class="table-responsive">
-                    <table>
-                        <tr>
-                            <th><?= __('Id') ?></th>
-                            <th><?= __('User Id') ?></th>
-                            <th><?= __('Created') ?></th>
-                            <th><?= __('Modified') ?></th>
-                            <th class="actions"><?= __('Actions') ?></th>
-                        </tr>
-                        <?php foreach ($group->group_users as $groupUser) : ?>
-                        <tr>
-                            <td><?= h($groupUser->id) ?></td>
-                            <td><?= h($groupUser->user_id) ?></td>
-                            <td><?= h($groupUser->created) ?></td>
-                            <td><?= h($groupUser->modified) ?></td>
-                            <td class="actions">
-                                <?= $this->Html->link(__('View'), ['controller' => 'GroupUsers', 'action' => 'view', $groupUser->id]) ?>
-                                <?= $this->Html->link(__('Edit'), ['controller' => 'GroupUsers', 'action' => 'edit', $groupUser->id]) ?>
-                                <?= $this->Form->postLink(
-                                    __('Delete'),
-                                    ['controller' => 'GroupUsers', 'action' => 'delete', $groupUser->id],
-                                    [
-                                        'method' => 'delete',
-                                        'confirm' => __('Are you sure you want to delete # {0}?', $groupUser->id),
-                                    ]
-                                ) ?>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">User ID</th>
+                                <th>Joined</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($group->group_users as $gu): ?>
+                            <tr>
+                                <td class="ps-4">
+                                    <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'view', $gu->user_id]) ?>"
+                                       class="fw-semibold text-decoration-none text-primary">
+                                        <i class="fa-regular fa-circle-user me-2"></i>User #<?= $gu->user_id ?>
+                                    </a>
+                                </td>
+                                <td class="text-muted small"><?= isset($gu->created) ? $gu->created->format('M d, Y') : '—' ?></td>
+                                <td class="text-end pe-4">
+                                    <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'view', $gu->user_id]) ?>" class="btn btn-sm btn-outline-primary">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
                     </table>
                 </div>
-                <?php endif; ?>
+            <?php endif; ?>
+        </div>
+
+        <!-- Permissions -->
+        <div class="glass-card">
+            <div class="p-4 border-bottom d-flex justify-content-between align-items-center" style="border-color:var(--border-color);">
+                <h6 class="fw-bold mb-0"><i class="fa-solid fa-key me-2 text-warning"></i>Group Permissions (<?= count($group->permissions ?? []) ?>)</h6>
+                <a href="<?= $this->Url->build(['controller' => 'Permissions', 'action' => 'add']) ?>" class="btn btn-sm btn-outline-primary">
+                    <i class="fa-solid fa-plus me-1"></i>Add Rule
+                </a>
             </div>
-            <div class="related">
-                <h4><?= __('Related Groups') ?></h4>
-                <?php if (!empty($group->child_groups)) : ?>
-                <div class="table-responsive">
-                    <table>
-                        <tr>
-                            <th><?= __('Id') ?></th>
-                            <th><?= __('Name') ?></th>
-                            <th><?= __('Registration Allowed') ?></th>
-                            <th><?= __('Created') ?></th>
-                            <th><?= __('Modified') ?></th>
-                            <th class="actions"><?= __('Actions') ?></th>
-                        </tr>
-                        <?php foreach ($group->child_groups as $childGroup) : ?>
-                        <tr>
-                            <td><?= h($childGroup->id) ?></td>
-                            <td><?= h($childGroup->name) ?></td>
-                            <td><?= h($childGroup->registration_allowed) ?></td>
-                            <td><?= h($childGroup->created) ?></td>
-                            <td><?= h($childGroup->modified) ?></td>
-                            <td class="actions">
-                                <?= $this->Html->link(__('View'), ['controller' => 'Groups', 'action' => 'view', $childGroup->id]) ?>
-                                <?= $this->Html->link(__('Edit'), ['controller' => 'Groups', 'action' => 'edit', $childGroup->id]) ?>
-                                <?= $this->Form->postLink(
-                                    __('Delete'),
-                                    ['controller' => 'Groups', 'action' => 'delete', $childGroup->id],
-                                    [
-                                        'method' => 'delete',
-                                        'confirm' => __('Are you sure you want to delete # {0}?', $childGroup->id),
-                                    ]
-                                ) ?>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </table>
+            <?php if (empty($group->permissions)): ?>
+                <div class="text-center text-muted py-4 small">
+                    <i class="fa-solid fa-key fa-2x mb-2 d-block opacity-50"></i>
+                    No permissions assigned to this group.
                 </div>
-                <?php endif; ?>
-            </div>
-            <div class="related">
-                <h4><?= __('Related Permissions') ?></h4>
-                <?php if (!empty($group->permissions)) : ?>
-                <div class="table-responsive">
-                    <table>
-                        <tr>
-                            <th><?= __('Id') ?></th>
-                            <th><?= __('Role Id') ?></th>
-                            <th><?= __('Controller') ?></th>
-                            <th><?= __('Action') ?></th>
-                            <th><?= __('Allowed') ?></th>
-                            <th><?= __('Created') ?></th>
-                            <th><?= __('Modified') ?></th>
-                            <th class="actions"><?= __('Actions') ?></th>
-                        </tr>
-                        <?php foreach ($group->permissions as $permission) : ?>
-                        <tr>
-                            <td><?= h($permission->id) ?></td>
-                            <td><?= h($permission->role_id) ?></td>
-                            <td><?= h($permission->controller) ?></td>
-                            <td><?= h($permission->action) ?></td>
-                            <td><?= h($permission->allowed) ?></td>
-                            <td><?= h($permission->created) ?></td>
-                            <td><?= h($permission->modified) ?></td>
-                            <td class="actions">
-                                <?= $this->Html->link(__('View'), ['controller' => 'Permissions', 'action' => 'view', $permission->id]) ?>
-                                <?= $this->Html->link(__('Edit'), ['controller' => 'Permissions', 'action' => 'edit', $permission->id]) ?>
-                                <?= $this->Form->postLink(
-                                    __('Delete'),
-                                    ['controller' => 'Permissions', 'action' => 'delete', $permission->id],
-                                    [
-                                        'method' => 'delete',
-                                        'confirm' => __('Are you sure you want to delete # {0}?', $permission->id),
-                                    ]
-                                ) ?>
-                            </td>
-                        </tr>
+            <?php else: ?>
+                <?php
+                $groupedPerms = [];
+                foreach ($group->permissions as $p) { $groupedPerms[$p->controller][] = $p; }
+                ?>
+                <div class="p-4">
+                    <div class="row g-3">
+                        <?php foreach ($groupedPerms as $ctrl => $perms): ?>
+                        <div class="col-md-4">
+                            <div class="p-3 rounded" style="border:1px solid var(--border-color);background:var(--bg-surface-2);">
+                                <div class="fw-semibold text-primary small mb-2"><i class="fa-solid fa-cube me-1"></i><?= h($ctrl) ?></div>
+                                <div class="d-flex flex-wrap gap-1">
+                                    <?php foreach ($perms as $p): ?>
+                                        <span class="badge <?= $p->allowed ? 'bg-success text-success' : 'bg-danger text-danger' ?>" style="font-size:0.7rem;">
+                                            <?= h($p->action) ?>
+                                        </span>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        </div>
                         <?php endforeach; ?>
-                    </table>
+                    </div>
                 </div>
-                <?php endif; ?>
-            </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

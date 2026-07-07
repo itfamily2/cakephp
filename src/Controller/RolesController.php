@@ -96,18 +96,74 @@ class RolesController extends AppController
      */
     public function edit($id = null)
     {
-        $role = $this->Roles->get($id, contain: []);
+        $role = $this->Roles->get($id, contain: ['Permissions']);
         $this->Authorization->authorize($role);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $role = $this->Roles->patchEntity($role, $this->request->getData());
-            if ($this->Roles->save($role)) {
-                $this->Notification->success(__('The role has been saved.'));
+        
+        // Define system controllers for multi-select
+        $controllersList = [
+            'Users' => 'Users Management',
+            'Roles' => 'Roles Management',
+            'Groups' => 'Groups Management',
+            'Permissions' => 'Permissions Management',
+            'Products' => 'Products Management',
+            'Categories' => 'Categories',
+            'Brands' => 'Brands',
+            'Orders' => 'Orders',
+            'Payments' => 'Payments',
+            'Invoices' => 'Invoices',
+            'Settings' => 'Settings',
+            'Logs' => 'System Logs',
+            'Reports' => 'Reports',
+            'Dashboard' => 'Dashboard',
+            'EmailTemplates' => 'Email Templates',
+            'EmailSignatures' => 'Email Signatures',
+            'ScheduledEmails' => 'Scheduled Emails',
+            'SentEmails' => 'Sent Emails',
+            'ContactEnquiries' => 'Contact Enquiries'
+        ];
 
+        // Extract currently allowed controllers
+        $currentControllers = [];
+        foreach ($role->permissions as $perm) {
+            if ($perm->allowed && $perm->action === '*') {
+                $currentControllers[] = $perm->controller;
+            }
+        }
+
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            $data = $this->request->getData();
+            $role = $this->Roles->patchEntity($role, $data);
+            
+            if ($this->Roles->save($role)) {
+                
+                // Handle permissions update if selected_controllers is provided
+                if (isset($data['selected_controllers']) && is_array($data['selected_controllers'])) {
+                    $permissionsTable = \Cake\ORM\TableRegistry::getTableLocator()->get('Permissions');
+                    
+                    // Delete existing broad controller permissions for this role
+                    $permissionsTable->deleteAll(['role_id' => $role->id, 'action' => '*']);
+                    
+                    // Add new ones
+                    $newPerms = [];
+                    foreach ($data['selected_controllers'] as $ctrl) {
+                        $newPerms[] = $permissionsTable->newEntity([
+                            'role_id' => $role->id,
+                            'controller' => $ctrl,
+                            'action' => '*',
+                            'allowed' => true
+                        ]);
+                    }
+                    if (!empty($newPerms)) {
+                        $permissionsTable->saveMany($newPerms);
+                    }
+                }
+
+                $this->Notification->success(__('The role has been saved.'));
                 return $this->redirect(['action' => 'index']);
             }
             $this->Notification->error(__('The role could not be saved. Please, try again.'));
         }
-        $this->set(compact('role'));
+        $this->set(compact('role', 'controllersList', 'currentControllers'));
     }
 
     /**

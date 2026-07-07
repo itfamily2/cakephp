@@ -45,12 +45,12 @@ class GroupsController extends AppController
             'limit' => 10,
         ]);
 
+        $this->set(compact('groups', 'search'));
+
         if ($this->request->is('ajax')) {
             $this->viewBuilder()->setLayout('ajax');
             return $this->render('ajax_index');
         }
-
-        $this->set(compact('groups', 'search'));
     }
 
     /**

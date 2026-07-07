@@ -127,7 +127,14 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             ->add(new AuthenticationMiddleware($this))
 
             // Add AuthorizationMiddleware.
-            ->add(new AuthorizationMiddleware($this))
+            // Wrap in a closure to skip authorization checks for DebugKit plugin routes
+            ->add(function ($request, $handler) {
+                if (str_starts_with($request->getUri()->getPath(), '/debug-kit/')) {
+                    return $handler->handle($request);
+                }
+                $middleware = new AuthorizationMiddleware($this);
+                return $middleware->process($request, $handler);
+            })
 
             // =================================================================
             // PHASE 19: Security Middlewares

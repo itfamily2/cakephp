@@ -176,6 +176,39 @@ return function (RouteBuilder $routes): void {
         // base class, overriding match() to enforce slug format via regex.
         // This keeps validation at the routing layer rather than in controllers."
         // =====================================================================
+        // =====================================================================
+        // Explicit CRUD routes before dynamic Slug routes to prevent conflicts
+        // =====================================================================
+        $builder->connect('/products/add', ['controller' => 'Products', 'action' => 'add']);
+        $builder->connect('/products/edit/*', ['controller' => 'Products', 'action' => 'edit']);
+        $builder->connect('/products/index', ['controller' => 'Products', 'action' => 'index']);
+        
+        $builder->connect('/categories/add', ['controller' => 'Categories', 'action' => 'add']);
+        $builder->connect('/categories/edit/*', ['controller' => 'Categories', 'action' => 'edit']);
+        $builder->connect('/categories/index', ['controller' => 'Categories', 'action' => 'index']);
+        
+        $builder->connect('/blog/add', ['controller' => 'CmsPages', 'action' => 'add']);
+        $builder->connect('/blog/edit/*', ['controller' => 'CmsPages', 'action' => 'edit']);
+
+        // Explicit routes for controllers that conflict with Plugin names
+        // Settings must be before the fallbacks() call to take priority over the Settings plugin
+        $builder->connect('/settings', ['controller' => 'Settings', 'action' => 'index']);
+        $builder->connect('/settings/add', ['controller' => 'Settings', 'action' => 'add']);
+        $builder->connect('/settings/edit/*', ['controller' => 'Settings', 'action' => 'edit']);
+        $builder->connect('/settings/delete/*', ['controller' => 'Settings', 'action' => 'delete']);
+        $builder->connect('/settings/view/*', ['controller' => 'Settings', 'action' => 'view']);
+        
+        $builder->connect('/payments', ['controller' => 'Payments', 'action' => 'index']);
+        $builder->connect('/payments/add', ['controller' => 'Payments', 'action' => 'add']);
+        $builder->connect('/payments/edit/*', ['controller' => 'Payments', 'action' => 'edit']);
+        $builder->connect('/payments/delete/*', ['controller' => 'Payments', 'action' => 'delete']);
+        $builder->connect('/payments/view/*', ['controller' => 'Payments', 'action' => 'view']);
+        $builder->connect('/payments/export', ['controller' => 'Payments', 'action' => 'export']);
+        $builder->connect('/payments/summary', ['controller' => 'Payments', 'action' => 'summary']);
+
+        // =====================================================================
+        // Dynamic Slug Routes
+        // =====================================================================
         $builder->connect('/products/{slug}',
             ['controller' => 'Products', 'action' => 'view'],
             [
