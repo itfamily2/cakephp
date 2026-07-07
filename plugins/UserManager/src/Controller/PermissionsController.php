@@ -1,7 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace UserManager\Controller;
+
+
+
 
 use Cake\ORM\TableRegistry;
 
@@ -34,6 +37,7 @@ use Cake\ORM\TableRegistry;
  */
 class PermissionsController extends AppController
 {
+    protected ?string $defaultTable = 'Permissions';
     // =========================================================================
     // 1. initialize() — Component loading and controller-wide configuration
     // =========================================================================

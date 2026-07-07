@@ -82,7 +82,7 @@ return function (RouteBuilder $routes): void {
         // is an extension or variation of this connect() call."
         // =====================================================================
         $builder->connect('/', [
-            'controller' => 'Users',
+            'plugin' => 'UserManager', 'controller' => 'Users',
             'action'     => 'dashboard',
         ]);
 
@@ -100,17 +100,17 @@ return function (RouteBuilder $routes): void {
         // INTERVIEW: "Named routes decouple URL generation from URL paths.
         // Change /users/login to /auth/login and no template breaks."
         // =====================================================================
-        $builder->connect('/users/login',    ['controller' => 'Users', 'action' => 'login'],    ['_name' => 'user-login']);
-        $builder->connect('/users/logout',   ['controller' => 'Users', 'action' => 'logout'],   ['_name' => 'user-logout']);
-        $builder->connect('/users/register', ['controller' => 'Users', 'action' => 'register'], ['_name' => 'user-register']);
+        $builder->connect('/users/login',    ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'login'],    ['_name' => 'user-login']);
+        $builder->connect('/users/logout',   ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'logout'],   ['_name' => 'user-logout']);
+        $builder->connect('/users/register', ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'register'], ['_name' => 'user-register']);
 
-        $builder->connect('/users/forgot-password',  ['controller' => 'Users', 'action' => 'forgotPassword'],  ['_name' => 'forgot-password']);
-        $builder->connect('/users/reset-password/*', ['controller' => 'Users', 'action' => 'resetPassword'],   ['_name' => 'reset-password']);
-        $builder->connect('/users/verify-email/*',   ['controller' => 'Users', 'action' => 'verifyEmail'],     ['_name' => 'verify-email']);
-        $builder->connect('/users/profile',          ['controller' => 'Users', 'action' => 'profile'],         ['_name' => 'user-profile']);
-        $builder->connect('/users/change-password',  ['controller' => 'Users', 'action' => 'changePassword'],  ['_name' => 'change-password']);
-        $builder->connect('/users/delete-account',   ['controller' => 'Users', 'action' => 'deleteAccount'],   ['_name' => 'delete-account']);
-        $builder->connect('/users/clear-cache',      ['controller' => 'Users', 'action' => 'clearCache'],      ['_name' => 'clear-cache']);
+        $builder->connect('/users/forgot-password',  ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'forgotPassword'],  ['_name' => 'forgot-password']);
+        $builder->connect('/users/reset-password/*', ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'resetPassword'],   ['_name' => 'reset-password']);
+        $builder->connect('/users/verify-email/*',   ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'verifyEmail'],     ['_name' => 'verify-email']);
+        $builder->connect('/users/profile',          ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'profile'],         ['_name' => 'user-profile']);
+        $builder->connect('/users/change-password',  ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'changePassword'],  ['_name' => 'change-password']);
+        $builder->connect('/users/delete-account',   ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'deleteAccount'],   ['_name' => 'delete-account']);
+        $builder->connect('/users/clear-cache',      ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'clearCache'],      ['_name' => 'clear-cache']);
 
 
         // =====================================================================
@@ -125,17 +125,17 @@ return function (RouteBuilder $routes): void {
         // variable URL segments. The router injects them as request parameters."
         // =====================================================================
         $builder->connect('/users/edit/{id}',
-            ['controller' => 'Users', 'action' => 'edit'],
+            ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'edit'],
             ['pass' => ['id']] // 'pass' makes {id} available as $id in the action
         );
 
         $builder->connect('/users/view/{id}',
-            ['controller' => 'Users', 'action' => 'view'],
+            ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'view'],
             ['pass' => ['id']]
         );
 
         $builder->connect('/users/activate/{id}',
-            ['controller' => 'Users', 'action' => 'toggleActive'],
+            ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'toggleActive'],
             ['pass' => ['id']]
         );
 
@@ -154,7 +154,7 @@ return function (RouteBuilder $routes): void {
         // the pattern — acting as a first layer of input validation."
         // =====================================================================
         $builder->connect('/api/resource/{id}',
-            ['controller' => 'Users', 'action' => 'view'],
+            ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'view'],
             [
                 'pass' => ['id'],
                 // UUID v4 pattern — router enforces this format automatically
@@ -256,15 +256,15 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/dashboard/clear-cache', ['controller' => 'Dashboard', 'action' => 'clearCache'], ['_name' => 'dashboard-clear-cache']);
 
         // Permissions routes
-        $builder->connect('/permissions',               ['controller' => 'Permissions', 'action' => 'index'],       ['_name' => 'permissions']);
-        $builder->connect('/permissions/add',           ['controller' => 'Permissions', 'action' => 'add'],         ['_name' => 'permissions-add']);
-        $builder->connect('/permissions/edit/{id}',     ['controller' => 'Permissions', 'action' => 'edit'],        ['_name' => 'permissions-edit',   'pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/permissions/delete/{id}',   ['controller' => 'Permissions', 'action' => 'delete'],      ['_name' => 'permissions-delete', 'pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/permissions/export',        ['controller' => 'Permissions', 'action' => 'export'],      ['_name' => 'permissions-export']);
-        $builder->connect('/permissions/json-list',     ['controller' => 'Permissions', 'action' => 'jsonList'],    ['_name' => 'permissions-json']);
-        $builder->connect('/permissions/xml-list',      ['controller' => 'Permissions', 'action' => 'xmlList'],     ['_name' => 'permissions-xml']);
-        $builder->connect('/permissions/bulk-import',   ['controller' => 'Permissions', 'action' => 'bulkImport'],  ['_name' => 'permissions-import']);
-        $builder->connect('/permissions/check-ajax',    ['controller' => 'Permissions', 'action' => 'checkAjax'],   ['_name' => 'permissions-check-ajax']);
+        $builder->connect('/permissions',               ['plugin' => 'UserManager', 'controller' => 'Permissions', 'action' => 'index'],       ['_name' => 'permissions']);
+        $builder->connect('/permissions/add',           ['plugin' => 'UserManager', 'controller' => 'Permissions', 'action' => 'add'],         ['_name' => 'permissions-add']);
+        $builder->connect('/permissions/edit/{id}',     ['plugin' => 'UserManager', 'controller' => 'Permissions', 'action' => 'edit'],        ['_name' => 'permissions-edit',   'pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/permissions/delete/{id}',   ['plugin' => 'UserManager', 'controller' => 'Permissions', 'action' => 'delete'],      ['_name' => 'permissions-delete', 'pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/permissions/export',        ['plugin' => 'UserManager', 'controller' => 'Permissions', 'action' => 'export'],      ['_name' => 'permissions-export']);
+        $builder->connect('/permissions/json-list',     ['plugin' => 'UserManager', 'controller' => 'Permissions', 'action' => 'jsonList'],    ['_name' => 'permissions-json']);
+        $builder->connect('/permissions/xml-list',      ['plugin' => 'UserManager', 'controller' => 'Permissions', 'action' => 'xmlList'],     ['_name' => 'permissions-xml']);
+        $builder->connect('/permissions/bulk-import',   ['plugin' => 'UserManager', 'controller' => 'Permissions', 'action' => 'bulkImport'],  ['_name' => 'permissions-import']);
+        $builder->connect('/permissions/check-ajax',    ['plugin' => 'UserManager', 'controller' => 'Permissions', 'action' => 'checkAjax'],   ['_name' => 'permissions-check-ajax']);
 
         // Reports routes
         $builder->connect('/reports',              ['controller' => 'Reports', 'action' => 'index'],     ['_name' => 'reports']);
@@ -315,14 +315,14 @@ return function (RouteBuilder $routes): void {
         $b->setExtensions(['json']);
         $b->resources('Products');
         $b->resources('Orders');
-        $b->connect('/users/token', ['controller' => 'Users', 'action' => 'token']);
+        $b->connect('/users/token', ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'token']);
         $b->fallbacks();
     });
 
-        $builder->connect('/login',    ['controller' => 'Users', 'action' => 'login'],    ['_name' => 'login']);
-        $builder->connect('/logout',   ['controller' => 'Users', 'action' => 'logout'],   ['_name' => 'logout']);
-        $builder->connect('/register', ['controller' => 'Users', 'action' => 'register'], ['_name' => 'register']);
-        $builder->connect('/profile',  ['controller' => 'Users', 'action' => 'profile'],  ['_name' => 'profile']);
+        $builder->connect('/login',    ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'login'],    ['_name' => 'login']);
+        $builder->connect('/logout',   ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'logout'],   ['_name' => 'logout']);
+        $builder->connect('/register', ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'register'], ['_name' => 'register']);
+        $builder->connect('/profile',  ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'profile'],  ['_name' => 'profile']);
 
 
         // =====================================================================
@@ -398,85 +398,6 @@ return function (RouteBuilder $routes): void {
 
     /*
      * =========================================================================
-     * PREFIX ROUTE: /admin
-     * =========================================================================
-     * Prefix routes add a URL segment AND namespace controllers.
-     * All controllers inside prefix('admin') must live in:
-     *   src/Controller/Admin/
-     *
-     * URL /admin/users → Admin\UsersController::index()
-     *
-     * HOW IT DIFFERS FROM SCOPE:
-     *   - scope() only adds a URL prefix
-     *   - prefix() adds URL prefix + maps to a sub-namespace in src/Controller/
-     *
-     * INTERVIEW: "Admin prefix routes separate admin controllers from public
-     * controllers at both the URL level and namespace level. A hacker who
-     * finds /users doesn't automatically know there's an /admin/users."
-     * =========================================================================
-     */
-    $routes->prefix('Admin', function (RouteBuilder $builder): void {
-        // Apply maintenance middleware to all Admin routes
-        $builder->registerMiddleware('maintenance', new MaintenanceModeMiddleware());
-        $builder->applyMiddleware('maintenance');
-
-        // ==================================================================
-        // EXPLICIT ADMIN NAMED ROUTES
-        // ==================================================================
-        // Even though fallbacks() would handle these, explicit named routes
-        // allow URL generation by name: $this->Url->build(['_name' => 'admin-users'])
-        // and make the codebase self-documenting.
-        //
-        // ROUTE: GET /admin/users → Admin\UsersController::index()
-        $builder->connect('/users',
-            ['controller' => 'Users', 'action' => 'index'],
-            ['_name' => 'admin-users']
-        );
-
-        // ROUTE: GET /admin/users/{id} → Admin\UsersController::view($id)
-        // {id} is constrained to integers, passed as positional param
-        $builder->connect('/users/{id}',
-            ['controller' => 'Users', 'action' => 'view'],
-            ['_name' => 'admin-users-view', 'pass' => ['id'], 'id' => '\d+']
-        );
-
-        // ROUTE: POST /admin/users/{id} → Admin\UsersController::edit($id)
-        $builder->connect('/users/{id}/edit',
-            ['controller' => 'Users', 'action' => 'edit'],
-            ['_name' => 'admin-users-edit', 'pass' => ['id'], 'id' => '\d+']
-        );
-
-        // ROUTE: GET /admin/orders → Admin\OrdersController::index()
-        $builder->connect('/orders',
-            ['controller' => 'Orders', 'action' => 'index'],
-            ['_name' => 'admin-orders']
-        );
-
-        // ROUTE: GET /admin/orders/{id} → Admin\OrdersController::view($id)
-        // ---------------------------------------------------------------
-        // This is the KEY example from Phase 3: /admin/orders/{id}
-        // Without this explicit route, fallbacks() would interpret
-        // /admin/orders/5 as action='5' which is WRONG.
-        // With 'pass' => ['id'], the {id} segment is injected as $id in view().
-        // ---------------------------------------------------------------
-        $builder->connect('/orders/{id}',
-            ['controller' => 'Orders', 'action' => 'view'],
-            ['_name' => 'admin-orders-view', 'pass' => ['id'], 'id' => '\d+']
-        );
-
-        // ROUTE: POST /admin/orders/{id}/update-status
-        $builder->connect('/orders/{id}/update-status',
-            ['controller' => 'Orders', 'action' => 'updateStatus'],
-            ['_name' => 'admin-orders-update-status', 'pass' => ['id'], 'id' => '\d+']
-        );
-
-        // Fallback resolves all remaining /admin/{controller}/{action} routes
-        $builder->fallbacks(DashedRoute::class);
-    });
-
-
-    /*
-     * =========================================================================
      * VERSION ROUTE + API ROUTE: /api/v1
      * =========================================================================
      * Versioned API scopes allow running multiple API versions simultaneously.
@@ -513,7 +434,7 @@ return function (RouteBuilder $routes): void {
             // Generates: GET /api/v1/users, POST /api/v1/users,
             //            GET /api/v1/users/{id}, PUT /api/v1/users/{id},
             //            DELETE /api/v1/users/{id}
-            $builder->resources('Users');
+            $builder->resources('Users', ['plugin' => 'UserManager']);
 
             // REST Resources for ERP modules
             $builder->resources('Products');
@@ -540,10 +461,10 @@ return function (RouteBuilder $routes): void {
             $builder->resources('Payments');
 
             // Named API routes for auth endpoints
-            $builder->connect('/auth/login',    ['controller' => 'Users', 'action' => 'login'],    ['_name' => 'api-v1-login']);
-            $builder->connect('/auth/register', ['controller' => 'Users', 'action' => 'register'], ['_name' => 'api-v1-register']);
-            $builder->connect('/auth/logout',   ['controller' => 'Users', 'action' => 'logout'],   ['_name' => 'api-v1-logout']);
-            $builder->connect('/auth/refresh',  ['controller' => 'Users', 'action' => 'refreshToken'], ['_name' => 'api-v1-refresh']);
+            $builder->connect('/auth/login',    ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'login'],    ['_name' => 'api-v1-login']);
+            $builder->connect('/auth/register', ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'register'], ['_name' => 'api-v1-register']);
+            $builder->connect('/auth/logout',   ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'logout'],   ['_name' => 'api-v1-logout']);
+            $builder->connect('/auth/refresh',  ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'refreshToken'], ['_name' => 'api-v1-refresh']);
 
             $builder->fallbacks(DashedRoute::class);
         });
@@ -555,22 +476,22 @@ return function (RouteBuilder $routes): void {
             $builder->setExtensions(['json', 'xml']);
 
             // V2 controllers live in src/Controller/Api/V2/
-            $builder->resources('Users');
+            $builder->resources('Users', ['plugin' => 'UserManager']);
             $builder->resources('Products');
 
             $builder->fallbacks(DashedRoute::class);
         });
 
         // Catch-all for unversioned /api/* requests — redirect or 404
-        $builder->connect('/users/login',    ['controller' => 'Users', 'action' => 'login']);
-        $builder->connect('/users/profile',  ['controller' => 'Users', 'action' => 'profile']);
-        $builder->connect('/users/register', ['controller' => 'Users', 'action' => 'register']);
-        $builder->connect('/users/forgot-password',  ['controller' => 'Users', 'action' => 'forgotPassword']);
-        $builder->connect('/users/reset-password/*', ['controller' => 'Users', 'action' => 'resetPassword']);
-        $builder->connect('/users/verify-email/*',   ['controller' => 'Users', 'action' => 'verifyEmail']);
-        $builder->connect('/users/change-password',  ['controller' => 'Users', 'action' => 'changePassword']);
-        $builder->connect('/users/status/*',         ['controller' => 'Users', 'action' => 'status']);
-        $builder->connect('/users',                  ['controller' => 'Users', 'action' => 'index']);
+        $builder->connect('/users/login',    ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'login']);
+        $builder->connect('/users/profile',  ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'profile']);
+        $builder->connect('/users/register', ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'register']);
+        $builder->connect('/users/forgot-password',  ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'forgotPassword']);
+        $builder->connect('/users/reset-password/*', ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'resetPassword']);
+        $builder->connect('/users/verify-email/*',   ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'verifyEmail']);
+        $builder->connect('/users/change-password',  ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'changePassword']);
+        $builder->connect('/users/status/*',         ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'status']);
+        $builder->connect('/users',                  ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'index']);
 
         $builder->fallbacks(DashedRoute::class);
     });

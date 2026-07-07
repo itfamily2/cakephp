@@ -1,7 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace UserManager\Controller;
+
+
+
 
 /**
  * Groups Controller
@@ -11,6 +14,7 @@ namespace App\Controller;
  */
 class GroupsController extends AppController
 {
+    protected ?string $defaultTable = 'Groups';
     /**
      * Initialize controller
      *
@@ -31,7 +35,7 @@ class GroupsController extends AppController
     public function index()
     {
         $query = $this->Groups->find()
-            ->contain(['ParentGroups']);
+            ->contain(['ParentGroups', 'GroupUsers', 'Permissions']);
         $query = $this->Authorization->applyScope($query);
 
         $search = $this->request->getQuery('search');
@@ -103,9 +107,25 @@ class GroupsController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $group = $this->Groups->patchEntity($group, $this->request->getData());
             if ($this->Groups->save($group)) {
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')
+                        ->withStringBody(json_encode([
+                            'success' => true,
+                            'message' => __('The group has been saved.'),
+                            'redirect' => $this->Url->build(['action' => 'index'])
+                        ]));
+                }
                 $this->Notification->success(__('The group has been saved.'));
-
                 return $this->redirect(['action' => 'index']);
+            }
+            
+            if ($this->request->is('ajax')) {
+                return $this->response->withType('application/json')->withStatus(400)
+                    ->withStringBody(json_encode([
+                        'success' => false,
+                        'message' => __('The group could not be saved. Please, try again.'),
+                        'errors' => $group->getErrors()
+                    ]));
             }
             $this->Notification->error(__('The group could not be saved. Please, try again.'));
         }

@@ -39,7 +39,7 @@ $this->assign('title', 'Groups Management');
     <div class="col-12">
         <div class="card glass-card p-4">
             <div id="groupsTableContainer">
-                <?= $this->element('../Groups/ajax_index') ?>
+                <?php include 'ajax_index.php'; ?>
             </div>
         </div>
     </div>

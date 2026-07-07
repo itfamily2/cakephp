@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Controller\Api\V1;
+namespace UserManager\Controller\Api\V1;
 
 use Cake\Utility\Security;
 use Firebase\JWT\JWT;

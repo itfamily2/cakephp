@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Controller\Api;
+namespace UserManager\Controller\Api;
 
 use Cake\Event\EventInterface;
 use Cake\ORM\TableRegistry;
@@ -14,6 +14,8 @@ use Firebase\JWT\JWT;
  */
 class UsersController extends ApiController
 {
+    protected ?string $defaultTable = 'Users';
+
     /**
      * initialize method
      */

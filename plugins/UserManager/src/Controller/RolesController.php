@@ -1,7 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace UserManager\Controller;
+
+
+
 
 /**
  * Roles Controller
@@ -11,6 +14,7 @@ namespace App\Controller;
  */
 class RolesController extends AppController
 {
+    protected ?string $defaultTable = 'Roles';
     /**
      * Initialize controller
      *
@@ -30,7 +34,7 @@ class RolesController extends AppController
      */
     public function index()
     {
-        $query = $this->Roles->find();
+        $query = $this->Roles->find()->contain(['Permissions', 'UserRoles']);
         $query = $this->Authorization->applyScope($query);
 
         $search = $this->request->getQuery('search');

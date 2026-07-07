@@ -95,28 +95,33 @@ class RequestPolicy implements RequestPolicyInterface
             ->extract('group_id')
             ->toArray();
 
-        // 3. Query permissions table
-        // We match controller & action, role_id or group_id
+        // 3. Query permissions table for explicit DENY rules
+        // If there is an explicit DENY for this controller/action (or wildcard *) for the user's roles/groups, block access.
         $permissionsTable = TableRegistry::getTableLocator()->get('Permissions');
         
-        $query = $permissionsTable->find()
+        $denyRule = $permissionsTable->find()
             ->where([
-                'allowed' => true,
+                'allowed' => false,
+                'LOWER(controller)' => $controller,
                 'OR' => [
-                    ['role_id IN' => $userRoles ?: [0]],
-                    ['group_id IN' => $userGroups ?: [0]],
+                    ['LOWER(action)' => $action],
+                    ['action' => '*']
+                ],
+                'AND' => [
+                    'OR' => [
+                        ['role_id IN' => $userRoles ?: [0]],
+                        ['group_id IN' => $userGroups ?: [0]],
+                    ]
                 ]
-            ]);
+            ])
+            ->first();
 
-        // Filter by controller, action. If we want general permissions (e.g. all actions of a controller), we could support wildcards, but let's check direct match
-        // Or check prefix/plugin if specified. Let's make it match controller and action:
-        $query->where([
-            'LOWER(controller)' => $controller,
-            'LOWER(action)' => $action
-        ]);
+        // If an explicit deny rule is found, block access
+        if ($denyRule !== null) {
+            return false;
+        }
 
-        $permission = $query->first();
-
-        return $permission !== null;
+        // Allow by default if no deny rules are found
+        return true;
     }
 }

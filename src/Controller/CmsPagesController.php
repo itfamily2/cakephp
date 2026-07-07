@@ -23,6 +23,13 @@ class CmsPagesController extends AppController
         $this->loadComponent('Authorization.Authorization');
     }
 
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        parent::beforeFilter($event);
+        // Allow public users to read CMS pages
+        $this->Authentication->allowUnauthenticated(['view']);
+    }
+
     /**
      * Index method
      *
@@ -66,7 +73,7 @@ class CmsPagesController extends AppController
     public function view($id = null)
     {
         $cmsPage = $this->CmsPages->get($id, contain: []);
-        $this->Authorization->authorize($cmsPage);
+        $this->Authorization->skipAuthorization();
         $this->set(compact('cmsPage'));
     }
 
