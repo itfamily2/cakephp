@@ -74,8 +74,25 @@ class ProductsController extends AppController
         $term = $this->request->getQuery('term', '');
         
         $query = $this->Products->find()
-            ->select(['id', 'name'])
-            ->where(['name LIKE' => "%$term%"])
+            ->select(['Products.id', 'Products.name', 'Products.price', 'Products.stock', 'Products.category_id', 'Products.brand_id'])
+            ->leftJoinWith('Categories')
+            ->leftJoinWith('Brands')
+            ->contain([
+                'Categories' => function ($q) {
+                    return $q->select(['Categories.id', 'Categories.name']);
+                },
+                'Brands' => function ($q) {
+                    return $q->select(['Brands.id', 'Brands.name']);
+                }
+            ])
+            ->where([
+                'Products.stock >' => 0,
+                'OR' => [
+                    'Products.name LIKE' => "%$term%",
+                    'Categories.name LIKE' => "%$term%",
+                    'Brands.name LIKE' => "%$term%"
+                ]
+            ])
             ->limit(10);
             
         $this->set('suggestions', $query->toArray());

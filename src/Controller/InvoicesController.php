@@ -47,8 +47,23 @@ class InvoicesController extends AppController
      */
     public function view($id = null)
     {
-        $invoice = $this->Invoices->get($id, contain: ['Orders']);
+        $invoice = $this->Invoices->get($id, contain: [
+            'Orders' => [
+                'Users',
+                'OrderItems' => ['Products']
+            ]
+        ]);
         $this->Authorization->authorize($invoice);
+        
+        if ($this->request->getParam('_ext') === 'pdf') {
+            $this->viewBuilder()->setClassName('CakePdf.Pdf');
+            $this->viewBuilder()->setOption('pdfConfig', [
+                'orientation' => 'portrait',
+                'download' => true,
+                'filename' => $invoice->invoice_number . '.pdf'
+            ]);
+        }
+        
         $this->set(compact('invoice'));
     }
 
@@ -57,20 +72,50 @@ class InvoicesController extends AppController
      *
      * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
      */
-    public function add()
+    public function add(\App\Service\InvoiceService $invoiceService)
     {
         $invoice = $this->Invoices->newEmptyEntity();
         $this->Authorization->authorize($invoice);
+        
         if ($this->request->is('post')) {
-            $invoice = $this->Invoices->patchEntity($invoice, $this->request->getData());
-            if ($this->Invoices->save($invoice)) {
-                $this->Notification->success(__('The invoice has been saved.'));
+            $orderId = (int)$this->request->getData('order_id');
+            $notes = $this->request->getData('notes');
+            
+            try {
+                $generatedInvoice = $invoiceService->generateFromOrder($orderId, $notes);
+                
+                if ($this->request->is('ajax') || $this->request->accepts('application/json')) {
+                    $this->set([
+                        'success' => true,
+                        'message' => 'Invoice generated successfully.',
+                        'invoice' => $generatedInvoice
+                    ]);
+                    $this->viewBuilder()->setClassName('Json');
+                    $this->viewBuilder()->setOption('serialize', ['success', 'message', 'invoice']);
+                    return;
+                }
 
+                $this->Notification->success(__('The invoice has been generated.'));
                 return $this->redirect(['action' => 'index']);
+            } catch (\Exception $e) {
+                if ($this->request->is('ajax') || $this->request->accepts('application/json')) {
+                    $this->set([
+                        'success' => false,
+                        'message' => 'Invoice generation failed: ' . $e->getMessage()
+                    ]);
+                    $this->viewBuilder()->setClassName('Json');
+                    $this->viewBuilder()->setOption('serialize', ['success', 'message']);
+                    return;
+                }
+                $this->Notification->error(__('Invoice failed: ') . $e->getMessage());
             }
-            $this->Notification->error(__('The invoice could not be saved. Please, try again.'));
         }
-        $orders = $this->Invoices->Orders->find('list', limit: 200)->all();
+        
+        // Only show orders that can be invoiced
+        $orders = $this->Invoices->Orders->find('list', limit: 200)
+            ->where(['status IN' => ['Accepted', 'Completed', 'Processing']])
+            ->all();
+            
         $this->set(compact('invoice', 'orders'));
     }
 

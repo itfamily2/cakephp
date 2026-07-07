@@ -71,6 +71,8 @@ return function (RouteBuilder $routes): void {
      * inherit that prefix automatically."
      */
     $routes->scope('/', function (RouteBuilder $builder): void {
+        
+        $builder->setExtensions(['json', 'xml', 'csv', 'pdf']);
 
         // =====================================================================
         // 1. BASIC ROUTE

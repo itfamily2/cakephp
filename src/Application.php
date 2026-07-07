@@ -269,6 +269,10 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
 
         // Phase 10: Log container build event
         \Cake\Log\Log::info('[PHASE 10] Application.buildContainer (services) — DI container being built');
+        
+        // Register ERP Services
+        $container->add(\App\Service\OrderService::class);
+        $container->add(\App\Service\InvoiceService::class);
     }
 
     /**

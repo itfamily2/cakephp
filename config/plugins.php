@@ -21,4 +21,5 @@ return [
     'Media' => [],
     'API' => [],
     'Payments' => [],
+    'CakePdf' => [],
 ];

@@ -6,6 +6,7 @@ namespace App\Controller;
 use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventInterface;
 use Cake\ORM\TableRegistry;
+use App\Service\OrderService;
 
 /**
  * OrdersController — Phase 6: Practical ORM Implementation
@@ -31,6 +32,10 @@ class OrdersController extends AppController
         parent::beforeFilter($event);
         $this->Authorization->skipAuthorization();
         $this->Authentication->addUnauthenticatedActions(['index', 'view', 'checkout', 'bulkUpdateStatus', 'advancedSearch']);
+
+        if (in_array($this->request->getParam('action'), ['add', 'edit'])) {
+            $this->getEventManager()->off($this->FormProtection);
+        }
     }
 
     /**
@@ -130,69 +135,49 @@ class OrdersController extends AppController
      * the logic in ConnectionManager::transactional(), I guarantee that if the stock
      * deduction fails, the order creation is rolled back."
      */
-    public function checkout()
+    public function checkout(OrderService $orderService)
     {
         $this->request->allowMethod(['post']);
 
         // Example simulated cart payload
-        // In reality, this comes from $this->request->getData()
-        $cartData = [
-            'user_id' => 1,
-            'order_number' => 'ORD-' . time(),
-            'total' => 100.00,
-            'status' => 'Pending',
-            'order_items' => [
-                ['product_id' => 1, 'quantity' => 2, 'price' => 50.00]
-            ]
-        ];
+        $cartData = $this->request->getData();
+        if (empty($cartData)) {
+            throw new \Exception("Cart data is required.");
+        }
 
-        $connection = ConnectionManager::get('default');
-        
         try {
-            // PHASE 6: Transactional Closure
-            $result = $connection->transactional(function ($conn) use ($cartData) {
-                
-                // PHASE 6: Marshalling with Nested Associations
-                // Converts the array into an Order entity AND nested OrderItem entities.
-                $order = $this->Orders->newEntity($cartData, [
-                    'associated' => ['OrderItems']
-                ]);
-
-                if ($order->hasErrors()) {
-                    // Throwing exception rolls back the transaction
-                    throw new \Exception('Validation failed: ' . json_encode($order->getErrors()));
-                }
-
-                // Save Order AND OrderItems in one go
-                if (!$this->Orders->save($order)) {
-                    throw new \Exception('Failed to save order');
-                }
-
-                // PHASE 6: Associated table updates inside transaction
-                $productsTable = TableRegistry::getTableLocator()->get('Products');
-                
-                foreach ($order->order_items as $item) {
-                    $product = $productsTable->get($item->product_id);
-                    
-                    if ($product->stock < $item->quantity) {
-                        throw new \Exception("Insufficient stock for product ID {$product->id}");
-                    }
-                    
-                    $product->stock -= $item->quantity;
-                    
-                    if (!$productsTable->save($product)) {
-                        throw new \Exception("Failed to deduct stock for product ID {$product->id}");
-                    }
-                }
-
-                return $order;
-            });
-
+            $order = $orderService->createOrder($cartData);
             $message = 'Checkout successful';
-            $data = $result;
-
+            $data = $order;
         } catch (\Exception $e) {
             $message = 'Checkout failed: ' . $e->getMessage();
+            $data = null;
+        }
+
+        $this->set(compact('message', 'data'));
+        $this->viewBuilder()->setClassName('Json');
+        $this->viewBuilder()->setOption('serialize', ['message', 'data']);
+    }
+
+    /**
+     * changeStatus() — Transitions order status using OrderService
+     *
+     * URL: POST /orders/change-status/:id
+     */
+    public function changeStatus($id, OrderService $orderService)
+    {
+        $this->request->allowMethod(['post']);
+        
+        $newStatus = $this->request->getData('status');
+        $notes = $this->request->getData('notes');
+        $userId = $this->Authentication->getIdentity()?->getIdentifier();
+
+        try {
+            $order = $orderService->transitionStatus($id, $newStatus, $userId, $notes);
+            $message = 'Status transitioned to ' . $newStatus;
+            $data = $order;
+        } catch (\Exception $e) {
+            $message = 'Status transition failed: ' . $e->getMessage();
             $data = null;
         }
 
@@ -238,20 +223,57 @@ class OrdersController extends AppController
      *
      * URL: POST /orders/add
      */
-    public function add()
+    public function add(OrderService $orderService)
     {
         $order = $this->Orders->newEmptyEntity();
         if ($this->request->is('post')) {
-            // PHASE 6: Marshalling
-            $order = $this->Orders->patchEntity($order, $this->request->getData());
-            if ($this->Orders->save($order)) {
-                $this->Notification->success(__('The order has been saved.'));
+            try {
+                $cartData = $this->request->getData();
+                $cartData['user_id'] = $this->Authentication->getIdentity()?->getIdentifier();
+                
+                $createdOrder = $orderService->createOrder($cartData);
+                
+                // Dispatch CakePHP Event
+                $event = new \Cake\Event\Event('Model.Order.created', $this, [
+                    'order' => $createdOrder
+                ]);
+                $this->getEventManager()->dispatch($event);
+                
+                if ($this->request->is('ajax') || $this->request->accepts('application/json')) {
+                    $this->set([
+                        'success' => true,
+                        'message' => 'The order has been created successfully.',
+                        'order' => $createdOrder
+                    ]);
+                    $this->viewBuilder()->setClassName('Json');
+                    $this->viewBuilder()->setOption('serialize', ['success', 'message', 'order']);
+                    return;
+                }
+
+                $this->Notification->success(__('The order has been created successfully.'));
                 return $this->redirect(['action' => 'index']);
+            } catch (\Exception $e) {
+                if ($this->request->is('ajax') || $this->request->accepts('application/json')) {
+                    $this->set([
+                        'success' => false,
+                        'message' => 'Order failed: ' . $e->getMessage()
+                    ]);
+                    $this->viewBuilder()->setClassName('Json');
+                    $this->viewBuilder()->setOption('serialize', ['success', 'message']);
+                    return;
+                }
+                $this->Notification->error(__('Order failed: ') . $e->getMessage());
             }
-            $this->Notification->error(__('The order could not be saved. Please, try again.'));
         }
         $users = $this->Orders->Users->find('list', limit: 200)->all();
-        $this->set(compact('order', 'users'));
+        $products = TableRegistry::getTableLocator()->get('Products')->find('list', [
+            'keyField' => 'id',
+            'valueField' => function ($product) {
+                return $product->name . ' - $' . number_format((float)$product->price, 2) . ' (' . $product->stock . ' in stock)';
+            }
+        ])->where(['stock >' => 0])->all();
+
+        $this->set(compact('order', 'users', 'products'));
     }
 
     /**
@@ -259,21 +281,55 @@ class OrdersController extends AppController
      *
      * URL: POST /orders/edit/{id}
      */
-    public function edit($id = null)
+    public function edit($id = null, OrderService $orderService)
     {
-        // Phase 6: Fetch entity without eager loading to update just the main record
-        $order = $this->Orders->get($id, contain: []);
+        $order = $this->Orders->get($id, contain: ['OrderItems' => ['Products']]);
         
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $order = $this->Orders->patchEntity($order, $this->request->getData());
-            if ($this->Orders->save($order)) {
+            try {
+                $cartData = $this->request->getData();
+                
+                // Set the default saveStrategy to replace so missing items are deleted
+                $this->Orders->OrderItems->setSaveStrategy('replace');
+                
+                $updatedOrder = $orderService->updateOrder($order, $cartData);
+                
+                if ($this->request->is('ajax') || $this->request->accepts('application/json')) {
+                    $this->set([
+                        'success' => true,
+                        'message' => 'The order has been updated successfully.',
+                        'order' => $updatedOrder
+                    ]);
+                    $this->viewBuilder()->setClassName('Json');
+                    $this->viewBuilder()->setOption('serialize', ['success', 'message', 'order']);
+                    return;
+                }
+
                 $this->Notification->success(__('The order has been saved.'));
                 return $this->redirect(['action' => 'index']);
+            } catch (\Exception $e) {
+                if ($this->request->is('ajax') || $this->request->accepts('application/json')) {
+                    $this->set([
+                        'success' => false,
+                        'message' => 'Update failed: ' . $e->getMessage()
+                    ]);
+                    $this->viewBuilder()->setClassName('Json');
+                    $this->viewBuilder()->setOption('serialize', ['success', 'message']);
+                    return;
+                }
+                $this->Notification->error(__('Update failed: ') . $e->getMessage());
             }
-            $this->Notification->error(__('The order could not be saved. Please, try again.'));
         }
+        
         $users = $this->Orders->Users->find('list', limit: 200)->all();
-        $this->set(compact('order', 'users'));
+        $products = \Cake\ORM\TableRegistry::getTableLocator()->get('Products')->find('list', [
+            'keyField' => 'id',
+            'valueField' => function ($product) {
+                return $product->name . ' - $' . number_format((float)$product->price, 2) . ' (' . $product->stock . ' in stock)';
+            }
+        ])->where(['stock >' => 0])->all();
+        
+        $this->set(compact('order', 'users', 'products'));
     }
 
     /**

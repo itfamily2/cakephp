@@ -27,7 +27,7 @@ class CmsPagesController extends AppController
     {
         parent::beforeFilter($event);
         // Allow public users to read CMS pages
-        $this->Authentication->allowUnauthenticated(['view']);
+        $this->Authentication->allowUnauthenticated(['view', 'display']);
     }
 
     /**
@@ -75,6 +75,19 @@ class CmsPagesController extends AppController
         $cmsPage = $this->CmsPages->get($id, contain: []);
         $this->Authorization->skipAuthorization();
         $this->set(compact('cmsPage'));
+    }
+
+    /**
+     * Display method (Public Slug Access)
+     *
+     * @param string|null $slug Cms Page slug.
+     */
+    public function display($slug = null)
+    {
+        $cmsPage = $this->CmsPages->findBySlug($slug)->firstOrFail();
+        $this->Authorization->skipAuthorization();
+        $this->set(compact('cmsPage'));
+        $this->render('view'); // Use the same view template
     }
 
     /**
