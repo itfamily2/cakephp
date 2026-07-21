@@ -128,7 +128,45 @@ class DashboardController extends AppController
         }, 'redis');
 
         // -------------------------------------------------------------------
-        // 5. Pass all data to the view using set() + compact()
+        // 5. System Health & Additional Lists (Restored from Legacy)
+        // -------------------------------------------------------------------
+        $diskFree = disk_free_space('/');
+        $diskTotal = disk_total_space('/');
+        $diskUsagePercent = $diskTotal > 0 ? round((($diskTotal - $diskFree) / $diskTotal) * 100, 2) : 0;
+        
+        function sizeFormatDashboard($bytes) {
+            $kb = 1024; $mb = $kb * 1024; $gb = $mb * 1024;
+            if ($bytes >= $gb) return round($bytes / $gb, 2) . ' GB';
+            if ($bytes >= $mb) return round($bytes / $mb, 2) . ' MB';
+            if ($bytes >= $kb) return round($bytes / $kb, 2) . ' KB';
+            return $bytes . ' B';
+        }
+
+        $systemHealth = [
+            'php_version' => PHP_VERSION,
+            'cake_version' => \Cake\Core\Configure::version(),
+            'memory_usage' => sizeFormatDashboard(memory_get_usage(true)),
+            'disk_usage' => $diskUsagePercent . '%',
+            'disk_free' => sizeFormatDashboard($diskFree),
+        ];
+
+        $recentEnquiriesList = \Cake\Cache\Cache::remember('dashboard_recent_enquiries_list', function () {
+            return $this->fetchTable('ContactEnquiries')->find()
+                ->orderBy(['created' => 'DESC'])
+                ->limit(5)
+                ->toArray();
+        }, 'redis');
+
+        $fifteenMinsAgo = new \DateTime('-15 minutes');
+        $onlineUsers = \Cake\Cache\Cache::remember('dashboard_online_users_list', function () use ($fifteenMinsAgo) {
+            return $this->fetchTable('Users')->find()
+                ->where(['last_login_time >=' => $fifteenMinsAgo])
+                ->orderBy(['last_login_time' => 'DESC'])
+                ->toArray();
+        }, 'redis');
+
+        // -------------------------------------------------------------------
+        // 6. Pass all data to the view using set() + compact()
         //    compact() is a PHP function that creates ['key' => $key] arrays
         // -------------------------------------------------------------------
         $this->set(compact(
@@ -138,8 +176,13 @@ class DashboardController extends AppController
             'pendingEnquiries',
             'recentActivities',
             'recentUsers',
-            'recentOrders'
+            'recentOrders',
+            'systemHealth',
+            'recentEnquiriesList',
+            'onlineUsers'
         ));
+
+        return null;
     }
 
     /**
@@ -184,6 +227,8 @@ class DashboardController extends AppController
         // _serialize tells JsonView which variables to serialize
         $this->set(compact('stats'));
         $this->viewBuilder()->setOption('serialize', ['stats']);
+        
+        return null;
     }
 
     /**

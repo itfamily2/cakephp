@@ -72,6 +72,12 @@ class BrandsController extends AppController
                 }
 
 $this->Notification->success(__('The brand has been saved.'));
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
 
                 return $this->redirect(['action' => 'index']);
             }
@@ -103,6 +109,12 @@ $this->Notification->success(__('The brand has been saved.'));
                 }
 
 $this->Notification->success(__('The brand has been saved.'));
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
 
                 return $this->redirect(['action' => 'index']);
             }

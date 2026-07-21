@@ -65,6 +65,12 @@ class AlertsController extends AppController
             $alert = $this->Alerts->patchEntity($alert, $this->request->getData());
             if ($this->Alerts->save($alert)) {
                 $this->Flash->success(__d('Notification', 'The alert has been saved.'));
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
 
                 return $this->redirect(['action' => 'index']);
             }
@@ -88,6 +94,12 @@ class AlertsController extends AppController
             $alert = $this->Alerts->patchEntity($alert, $this->request->getData());
             if ($this->Alerts->save($alert)) {
                 $this->Flash->success(__d('Notification', 'The alert has been saved.'));
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
 
                 return $this->redirect(['action' => 'index']);
             }

@@ -218,6 +218,13 @@ class PermissionsController extends AppController
 
             if ($permissionsTable->save($permission)) {
                 $this->Notification->success(__('Permission updated.'));
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
                 return $this->redirect(['action' => 'index']);
             }
 
@@ -414,7 +421,14 @@ class PermissionsController extends AppController
             }
 
             $this->Notification->success(__('Imported {0} permissions successfully.', $imported));
-            return $this->redirect(['action' => 'index']);
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+                return $this->redirect(['action' => 'index']);
         }
     }
 

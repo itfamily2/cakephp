@@ -259,6 +259,13 @@ class OrdersController extends AppController
                 }
 
 $this->Notification->success(__('The order has been created successfully.'));
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
                 return $this->redirect(['action' => 'index']);
             } catch (\Exception $e) {
                 if ($this->request->is('ajax') || $this->request->accepts('application/json')) {
@@ -322,6 +329,13 @@ $this->Notification->success(__('The order has been created successfully.'));
                 }
 
 $this->Notification->success(__('The order has been saved.'));
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
                 return $this->redirect(['action' => 'index']);
             } catch (\Exception $e) {
                 if ($this->request->is('ajax') || $this->request->accepts('application/json')) {

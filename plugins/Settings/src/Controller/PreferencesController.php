@@ -65,6 +65,12 @@ class PreferencesController extends AppController
             $preference = $this->Preferences->patchEntity($preference, $this->request->getData());
             if ($this->Preferences->save($preference)) {
                 $this->Flash->success(__d('Settings', 'The preference has been saved.'));
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
 
                 return $this->redirect(['action' => 'index']);
             }
@@ -88,6 +94,12 @@ class PreferencesController extends AppController
             $preference = $this->Preferences->patchEntity($preference, $this->request->getData());
             if ($this->Preferences->save($preference)) {
                 $this->Flash->success(__d('Settings', 'The preference has been saved.'));
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
 
                 return $this->redirect(['action' => 'index']);
             }

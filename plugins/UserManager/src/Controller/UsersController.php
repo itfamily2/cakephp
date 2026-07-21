@@ -20,7 +20,7 @@ class UsersController extends AppController
     public function beforeFilter(EventInterface $event)
     {
         parent::beforeFilter($event);
-        
+
         // Allow unauthenticated access to these actions
         $this->Authentication->allowUnauthenticated(['login', 'register', 'forgotPassword', 'resetPassword', 'verifyEmail', 'socialLogin']);
     }
@@ -35,7 +35,7 @@ class UsersController extends AppController
 
         // 1. Stats
         $today = new \DateTime('today');
-        
+
         $todayLoginCount = \Cake\Cache\Cache::remember('dashboard_today_login_count', function () use ($today) {
             return $this->Users->find()
                 ->where(['last_login_time >=' => $today])
@@ -147,10 +147,10 @@ class UsersController extends AppController
     {
         $this->Authorization->skipAuthorization();
         $result = $this->Authentication->getResult();
-        
+
         if ($result && $result->isValid()) {
             $user = $this->Authentication->getIdentity()->getOriginalData();
-            
+
             if (!$user->is_active) {
                 $this->Authentication->logout();
                 $this->Notification->error(__('Your account is deactivated. Please contact support.'));
@@ -167,7 +167,7 @@ class UsersController extends AppController
             $this->clearDashboardCache();
 
             $redirect = $this->request->getQuery('redirect', '/');
-            
+
             // PHASE 15: AJAX Login Success
             if ($this->request->is('json') || $this->request->is('ajax')) {
                 $this->set(['success' => true, 'redirect' => $redirect]);
@@ -175,13 +175,13 @@ class UsersController extends AppController
                 $this->viewBuilder()->setOption('serialize', ['success', 'redirect']);
                 return;
             }
-            
+
             return $this->redirect($redirect);
         }
 
         if ($this->request->is('post')) {
             $this->Notification->error(__('Invalid username or password.'));
-            
+
             // PHASE 15: AJAX Login Error
             if ($this->request->is('json') || $this->request->is('ajax')) {
                 $this->set(['success' => false, 'message' => __('Invalid username or password.')]);
@@ -198,7 +198,7 @@ class UsersController extends AppController
     public function logout()
     {
         $this->Authorization->skipAuthorization();
-        
+
         $identity = $this->Authentication->getIdentity();
         if ($identity) {
             $user = $identity->getOriginalData();
@@ -217,10 +217,10 @@ class UsersController extends AppController
     {
         $this->Authorization->skipAuthorization();
         $user = $this->Users->newEmptyEntity();
-        
+
         if ($this->request->is('post')) {
             $user = $this->Users->patchEntity($user, $this->request->getData());
-            
+
             // Generate verification token
             $user->verification_token = Security::randomString(32);
             $user->email_verified = false;
@@ -248,12 +248,12 @@ class UsersController extends AppController
                 $this->queueEmail(
                     $user->email,
                     'Verify your email address',
-                    'Hello ' . $user->username . ', please verify your email using this link: ' . 
+                    'Hello ' . $user->username . ', please verify your email using this link: ' .
                     \Cake\Routing\Router::url(['action' => 'verifyEmail', $user->verification_token], true)
                 );
 
                 $this->Notification->success(__('Registration successful. Please check your email to verify your account.'));
-                
+
                 // PHASE 15: AJAX Register Success
                 if ($this->request->is('json') || $this->request->is('ajax')) {
                     $this->set('success', true);
@@ -261,11 +261,11 @@ class UsersController extends AppController
                     $this->viewBuilder()->setOption('serialize', ['success']);
                     return;
                 }
-                
+
                 return $this->redirect(['action' => 'login']);
             }
             $this->Notification->error(__('Registration failed. Please review the errors below.'));
-            
+
             // PHASE 15: AJAX Register Validation Errors
             if ($this->request->is('json') || $this->request->is('ajax')) {
                 $this->set('success', false);
@@ -285,10 +285,10 @@ class UsersController extends AppController
     public function notifications()
     {
         $this->Authorization->skipAuthorization();
-        
+
         $identity = $this->Authentication->getIdentity();
         $notifications = [];
-        
+
         if ($identity) {
             $this->loadModel('ActivityLogs');
             $notifications = $this->ActivityLogs->find()
@@ -297,7 +297,7 @@ class UsersController extends AppController
                 ->limit(5)
                 ->toArray();
         }
-        
+
         $this->set(compact('notifications'));
         $this->viewBuilder()->setClassName('Json');
         $this->viewBuilder()->setOption('serialize', ['notifications']);
@@ -342,7 +342,7 @@ class UsersController extends AppController
         if ($this->request->is('post')) {
             $email = $this->request->getData('email');
             $user = $this->Users->find()->where(['email' => $email])->first();
-            
+
             if ($user) {
                 $user->password_reset_token = Security::randomString(32);
                 $user->password_reset_expiry = new DateTime('+2 hours');
@@ -351,7 +351,7 @@ class UsersController extends AppController
                 $this->queueEmail(
                     $user->email,
                     'Reset your password',
-                    'Reset your password using this link: ' . 
+                    'Reset your password using this link: ' .
                     \Cake\Routing\Router::url(['action' => 'resetPassword', $user->password_reset_token], true)
                 );
 
@@ -390,7 +390,7 @@ class UsersController extends AppController
             $user = $this->Users->patchEntity($user, $this->request->getData());
             $user->password_reset_token = null;
             $user->password_reset_expiry = null;
-            
+
             if ($this->Users->save($user)) {
                 $this->Activity->logActivity('Reset Password', 'Password reset successfully.');
                 $this->Notification->success(__('Password reset successfully. You can now log in.'));
@@ -407,7 +407,7 @@ class UsersController extends AppController
     public function socialLogin($provider = 'google')
     {
         $this->Authorization->skipAuthorization();
-        
+
         // Simulating the social API response with default user details
         $socialEmail = $provider . '_user_' . rand(100, 999) . '@example.com';
         $socialUsername = $provider . '_user_' . rand(10, 99);
@@ -415,7 +415,7 @@ class UsersController extends AppController
         // Check if user exists
         $user = $this->Users->find()->where(['email' => $socialEmail])->first();
         $isNew = false;
-        
+
         if (!$user) {
             $isNew = true;
             $user = $this->Users->newEmptyEntity();
@@ -424,10 +424,10 @@ class UsersController extends AppController
             $user->password = Security::randomString(16); // Random temp password
             $user->email_verified = true;
             $user->is_active = true;
-            
+
             // Simulating profile image from social provider
-            $user->profile_image = 'default_social.png'; 
-            
+            $user->profile_image = 'default_social.png';
+
             $this->Users->save($user);
 
             // Assign role
@@ -447,7 +447,7 @@ class UsersController extends AppController
 
         // Log the user in
         $this->Authentication->setIdentity($user);
-        
+
         // Save last login
         $user->last_login_time = new DateTime();
         $user->last_login_ip = $this->request->clientIp();
@@ -479,14 +479,14 @@ class UsersController extends AppController
 
         if ($this->request->is(['post', 'put'])) {
             $data = $this->request->getData();
-            
+
             // Image upload
             $attachment = $this->request->getData('profile_image_file');
             if ($attachment && $attachment->getError() === UPLOAD_ERR_OK) {
                 try {
                     $newName = $this->Upload->upload($attachment, 'profiles');
                     $data['profile_image'] = $newName;
-                    
+
                     // Simulated resizing helper
                     $this->resizeImage(WWW_ROOT . 'uploads' . DS . 'profiles' . DS . $newName, 150, 150);
                 } catch (\Exception $e) {
@@ -519,14 +519,14 @@ class UsersController extends AppController
             // Confirm current password
             $currentPassword = $this->request->getData('current_password');
             $hasher = new \Authentication\PasswordHasher\DefaultPasswordHasher();
-            
+
             if (!$hasher->check($currentPassword, $user->password)) {
                 $this->Notification->error(__('Current password is incorrect.'));
             } else {
                 $user = $this->Users->patchEntity($user, [
                     'password' => $this->request->getData('new_password')
                 ]);
-                
+
                 if ($this->Users->save($user)) {
                     $this->Activity->logActivity('Change Password', 'Changed password successfully.');
                     $this->Notification->success(__('Password changed successfully.'));
@@ -545,7 +545,7 @@ class UsersController extends AppController
     {
         $this->Authorization->skipAuthorization();
         $this->request->allowMethod(['post', 'delete']);
-        
+
         $userId = $this->Authentication->getIdentity()->get('id');
         $user = $this->Users->get($userId);
 
@@ -564,7 +564,7 @@ class UsersController extends AppController
     public function index()
     {
         // Handled by RequestPolicy in authorization stage
-        
+
         $query = $this->Users->find()->contain(['UserRoles.Roles', 'GroupUsers.Groups']);
 
         // Ajax Search & Autocomplete
@@ -624,7 +624,7 @@ class UsersController extends AppController
                     $userRolesTable = TableRegistry::getTableLocator()->get('UserRoles');
                     $userRole = $userRolesTable->newEmptyEntity();
                     $userRole->user_id = $user->id;
-                    $userRole->role_id = (int)$roleId;
+                    $userRole->role_id = (int) $roleId;
                     $userRolesTable->save($userRole);
                 }
 
@@ -634,7 +634,7 @@ class UsersController extends AppController
                     $groupUsersTable = TableRegistry::getTableLocator()->get('GroupUsers');
                     $groupUser = $groupUsersTable->newEmptyEntity();
                     $groupUser->user_id = $user->id;
-                    $groupUser->group_id = (int)$groupId;
+                    $groupUser->group_id = (int) $groupId;
                     $groupUsersTable->save($groupUser);
                 }
 
@@ -659,22 +659,28 @@ class UsersController extends AppController
         $user = $this->Users->get($id, [
             'contain' => ['UserRoles', 'GroupUsers', 'UserRoles.Roles', 'GroupUsers.Groups']
         ]);
-        
-        $roleIds = array_filter(array_map(function($ur) { return $ur->role_id; }, $user->user_roles ?? []));
-        $groupIds = array_filter(array_map(function($gu) { return $gu->group_id; }, $user->group_users ?? []));
-        
+
+        $roleIds = array_filter(array_map(function ($ur) {
+            return $ur->role_id;
+        }, $user->user_roles ?? []));
+        $groupIds = array_filter(array_map(function ($gu) {
+            return $gu->group_id;
+        }, $user->group_users ?? []));
+
         $permissions = [];
         if (!empty($roleIds) || !empty($groupIds)) {
             $conditions = [];
-            if (!empty($roleIds)) $conditions['role_id IN'] = $roleIds;
-            if (!empty($groupIds)) $conditions['group_id IN'] = $groupIds;
-            
+            if (!empty($roleIds))
+                $conditions['role_id IN'] = $roleIds;
+            if (!empty($groupIds))
+                $conditions['group_id IN'] = $groupIds;
+
             $permissions = \Cake\ORM\TableRegistry::getTableLocator()->get('Permissions')
                 ->find()
                 ->where(['OR' => $conditions])
                 ->all();
         }
-        
+
         $this->set(compact('user', 'permissions'));
     }
 
@@ -701,7 +707,7 @@ class UsersController extends AppController
                     $userRolesTable->deleteAll(['user_id' => $user->id]);
                     $userRole = $userRolesTable->newEmptyEntity();
                     $userRole->user_id = $user->id;
-                    $userRole->role_id = (int)$roleId;
+                    $userRole->role_id = (int) $roleId;
                     $userRolesTable->save($userRole);
                 }
 
@@ -712,13 +718,13 @@ class UsersController extends AppController
                     $groupUsersTable->deleteAll(['user_id' => $user->id]);
                     $groupUser = $groupUsersTable->newEmptyEntity();
                     $groupUser->user_id = $user->id;
-                    $groupUser->group_id = (int)$groupId;
+                    $groupUser->group_id = (int) $groupId;
                     $groupUsersTable->save($groupUser);
                 }
 
                 $this->Activity->logActivity('Admin Edit User', 'Admin updated user configuration.');
                 $this->clearDashboardCache();
-                
+
                 if ($this->request->is('ajax')) {
                     return $this->response->withType('application/json')->withStringBody(json_encode([
                         'success' => true,
@@ -729,7 +735,7 @@ class UsersController extends AppController
                 $this->Notification->success(__('User updated successfully.'));
                 return $this->redirect(['action' => 'index']);
             }
-            
+
             if (!$this->request->is('ajax')) {
                 $this->Notification->error(__('Unable to update user.'));
             }
@@ -752,7 +758,7 @@ class UsersController extends AppController
     {
         $this->request->allowMethod(['post', 'delete']);
         $user = $this->Users->get($id);
-        
+
         if ($this->Users->delete($user)) {
             $this->clearDashboardCache();
             $this->Notification->success(__('User has been deleted.'));
@@ -771,7 +777,7 @@ class UsersController extends AppController
         $this->request->allowMethod(['post']);
         $user = $this->Users->get($id);
         $user->is_active = !$user->is_active;
-        
+
         if ($this->Users->save($user)) {
             $status = $user->is_active ? 'activated' : 'deactivated';
             $this->Activity->logActivity('Admin Toggle Status', 'Admin ' . $status . ' user account.');
@@ -791,11 +797,11 @@ class UsersController extends AppController
     {
         $this->request->allowMethod(['post']);
         $user = $this->Users->get($id);
-        
+
         // Simulating force logging out of a user:
         // We delete their remember token and can deactivate or set login token to empty.
         $user->remember_token = null;
-        
+
         // To force logout, we can update their modified timestamp and clear session reference.
         // We also allow toggling active status if requested: "Admin can logout & inactivate any online user"
         $inactivate = $this->request->getData('inactivate');
@@ -828,14 +834,15 @@ class UsersController extends AppController
             if ($file && $file->getError() === UPLOAD_ERR_OK) {
                 $filePath = $file->getStream()->getMetadata('uri');
                 $handle = fopen($filePath, 'r');
-                
+
                 // Read header
                 $header = fgetcsv($handle);
                 $successCount = 0;
                 $failCount = 0;
 
                 while (($row = fgetcsv($handle)) !== false) {
-                    if (count($row) < 3) continue;
+                    if (count($row) < 3)
+                        continue;
 
                     $userData = [
                         'username' => $row[0],
@@ -885,7 +892,7 @@ class UsersController extends AppController
         $this->response = $this->response->withType('csv');
 
         $users = $this->Users->find()->contain(['UserRoles.Roles', 'GroupUsers.Groups'])->all();
-        
+
         $handle = fopen('php://temp', 'r+');
         fputcsv($handle, ['ID', 'Username', 'Email', 'Role', 'Group', 'Active', 'Last Login', 'Created']);
 
@@ -917,20 +924,22 @@ class UsersController extends AppController
     public function clearCache()
     {
         $this->Authorization->skipAuthorization();
-        
+
         // Clear all caches
         Cache::clear('default');
         Cache::clear('_cake_core_');
         Cache::clear('_cake_model_');
-        
+
         try {
             Cache::clear('redis');
-        } catch (\Exception $e) {}
-        
+        } catch (\Exception $e) {
+        }
+
         // If there are other cache engines configured
         try {
             Cache::clear('_cake_routes_');
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
 
         $this->Notification->success(__('All CakePHP system caches cleared successfully.'));
         return $this->redirect($this->referer('/'));
@@ -978,7 +987,7 @@ function sizeFormat($bytes)
     $kb = 1024;
     $mb = $kb * 1024;
     $gb = $mb * 1024;
-    
+
     if ($bytes >= $gb) {
         return round($bytes / $gb, 2) . ' GB';
     } elseif ($bytes >= $mb) {

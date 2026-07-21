@@ -84,6 +84,12 @@ class GroupsController extends AppController
             $group = $this->Groups->patchEntity($group, $this->request->getData());
             if ($this->Groups->save($group)) {
                 $this->Notification->success(__('The group has been saved.'));
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
 
                 return $this->redirect(['action' => 'index']);
             }
@@ -116,6 +122,13 @@ class GroupsController extends AppController
                         ]));
                 }
                 $this->Notification->success(__('The group has been saved.'));
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
                 return $this->redirect(['action' => 'index']);
             }
             

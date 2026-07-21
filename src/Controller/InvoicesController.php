@@ -104,6 +104,13 @@ class InvoicesController extends AppController
                 }
 
 $this->Notification->success(__('The invoice has been generated.'));
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
                 return $this->redirect(['action' => 'index']);
             } catch (\Exception $e) {
                 if ($this->request->is('ajax') || $this->request->accepts('application/json')) {
@@ -150,6 +157,12 @@ $this->Notification->success(__('The invoice has been generated.'));
                 }
 
 $this->Notification->success(__('The invoice has been saved.'));
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
 
                 return $this->redirect(['action' => 'index']);
             }

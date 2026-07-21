@@ -65,6 +65,12 @@ class TransactionsController extends AppController
             $transaction = $this->Transactions->patchEntity($transaction, $this->request->getData());
             if ($this->Transactions->save($transaction)) {
                 $this->Flash->success(__d('Payments', 'The transaction has been saved.'));
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
 
                 return $this->redirect(['action' => 'index']);
             }
@@ -88,6 +94,12 @@ class TransactionsController extends AppController
             $transaction = $this->Transactions->patchEntity($transaction, $this->request->getData());
             if ($this->Transactions->save($transaction)) {
                 $this->Flash->success(__d('Payments', 'The transaction has been saved.'));
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
 
                 return $this->redirect(['action' => 'index']);
             }

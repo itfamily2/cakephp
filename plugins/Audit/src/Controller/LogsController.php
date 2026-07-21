@@ -65,6 +65,12 @@ class LogsController extends AppController
             $log = $this->Logs->patchEntity($log, $this->request->getData());
             if ($this->Logs->save($log)) {
                 $this->Flash->success(__d('Audit', 'The log has been saved.'));
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
 
                 return $this->redirect(['action' => 'index']);
             }
@@ -88,6 +94,12 @@ class LogsController extends AppController
             $log = $this->Logs->patchEntity($log, $this->request->getData());
             if ($this->Logs->save($log)) {
                 $this->Flash->success(__d('Audit', 'The log has been saved.'));
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
 
                 return $this->redirect(['action' => 'index']);
             }

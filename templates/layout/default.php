@@ -105,6 +105,26 @@ $currentUser = $currentUser ?? null;
                     <i class="fa-solid fa-file-invoice-dollar"></i> Invoices
                 </a>
 
+                <div class="sidebar-menu-title">Plugins & Modules</div>
+                <a href="<?= $this->Url->build(['plugin' => 'CMS', 'controller' => 'Pages', 'action' => 'index']) ?>" class="sidebar-link <?= str_contains($this->request->getPath(), '/cms/pages') ? 'active' : '' ?>">
+                    <i class="fa-solid fa-pager"></i> CMS Plugin
+                </a>
+                <a href="<?= $this->Url->build(['plugin' => 'Media', 'controller' => 'Attachments', 'action' => 'index']) ?>" class="sidebar-link <?= str_contains($this->request->getPath(), '/media/attachments') ? 'active' : '' ?>">
+                    <i class="fa-solid fa-photo-film"></i> Media Plugin
+                </a>
+                <a href="<?= $this->Url->build(['plugin' => 'Notification', 'controller' => 'Alerts', 'action' => 'index']) ?>" class="sidebar-link <?= str_contains($this->request->getPath(), '/notification/alerts') ? 'active' : '' ?>">
+                    <i class="fa-solid fa-bell"></i> Alerts Plugin
+                </a>
+                <a href="<?= $this->Url->build(['plugin' => 'Payments', 'controller' => 'Transactions', 'action' => 'index']) ?>" class="sidebar-link <?= str_contains($this->request->getPath(), '/payments/transactions') ? 'active' : '' ?>">
+                    <i class="fa-solid fa-money-bill-transfer"></i> TXN Plugin
+                </a>
+                <a href="<?= $this->Url->build(['plugin' => 'Settings', 'controller' => 'Preferences', 'action' => 'index']) ?>" class="sidebar-link <?= str_contains($this->request->getPath(), '/settings/preferences') ? 'active' : '' ?>">
+                    <i class="fa-solid fa-sliders"></i> Prefs Plugin
+                </a>
+                <a href="<?= $this->Url->build(['plugin' => 'API', 'controller' => 'Endpoints', 'action' => 'index']) ?>" class="sidebar-link <?= str_contains($this->request->getPath(), '/api/endpoints') ? 'active' : '' ?>">
+                    <i class="fa-solid fa-server"></i> API Plugin
+                </a>
+
                 <div class="sidebar-menu-title">System</div>
                 <a href="<?= $this->Url->build('/settings') ?>" class="sidebar-link <?= str_contains($this->request->getPath(), '/settings') ? 'active' : '' ?>">
                     <i class="fa-solid fa-gears"></i> Settings
