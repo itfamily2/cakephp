@@ -68,7 +68,7 @@
                     </td>
                     <td class="text-muted small"><?= $log->created ? date('M d, Y H:i:s', strtotime($log->created)) : '-' ?></td>
                     <td class="text-end pe-4">
-                        <?= $this->Html->link('<i class="fa-solid fa-eye"></i>', ['action' => 'view', $log->id], ['class' => 'btn btn-sm btn-outline-info', 'escape' => false]) ?>
+                        <?= $this->Html->link('<i class="fa-solid fa-eye"></i>', ['action' => 'view', $log->id], ['class' => 'btn btn-sm btn-outline-info ajax-modal-link', 'escape' => false]) ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>

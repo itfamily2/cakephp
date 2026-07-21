@@ -1,142 +1,30 @@
-<?php
-/**
- * @var \App\View\AppView $this
- * @var \App\Model\Entity\EmailSignature $emailSignature
- */
-?>
-<div class="row">
-    <aside class="column">
-        <div class="side-nav">
-            <h4 class="heading"><?= __('Actions') ?></h4>
-            <?= $this->Html->link(__('Edit Email Signature'), ['action' => 'edit', $emailSignature->id], ['class' => 'side-nav-item']) ?>
-            <?= $this->Form->postLink(__('Delete Email Signature'), ['action' => 'delete', $emailSignature->id], ['confirm' => __('Are you sure you want to delete # {0}?', $emailSignature->id), 'class' => 'side-nav-item']) ?>
-            <?= $this->Html->link(__('List Email Signatures'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
-            <?= $this->Html->link(__('New Email Signature'), ['action' => 'add'], ['class' => 'side-nav-item']) ?>
-        </div>
-    </aside>
-    <div class="column column-80">
-        <div class="emailSignatures view content">
-            <h3><?= h($emailSignature->name) ?></h3>
-            <table>
-                <tr>
-                    <th><?= __('Name') ?></th>
+<!-- Auto-Redesigned View -->
+
+<div class="table-responsive">
+    <table class="table table-hover table-bordered mb-0">
+<tr>
+                    <th class="bg-light text-muted w-25"><?= __('Name') ?></th>
                     <td><?= h($emailSignature->name) ?></td>
                 </tr>
-                <tr>
-                    <th><?= __('User') ?></th>
+<tr>
+                    <th class="bg-light text-muted w-25"><?= __('User') ?></th>
                     <td><?= $emailSignature->hasValue('user') ? $this->Html->link($emailSignature->user->username, ['controller' => 'Users', 'action' => 'view', $emailSignature->user->id]) : '' ?></td>
                 </tr>
-                <tr>
-                    <th><?= __('Id') ?></th>
+<tr>
+                    <th class="bg-light text-muted w-25"><?= __('Id') ?></th>
                     <td><?= $this->Number->format($emailSignature->id) ?></td>
                 </tr>
-                <tr>
-                    <th><?= __('Created') ?></th>
+<tr>
+                    <th class="bg-light text-muted w-25"><?= __('Created') ?></th>
                     <td><?= h($emailSignature->created) ?></td>
                 </tr>
-                <tr>
-                    <th><?= __('Modified') ?></th>
+<tr>
+                    <th class="bg-light text-muted w-25"><?= __('Modified') ?></th>
                     <td><?= h($emailSignature->modified) ?></td>
                 </tr>
-            </table>
-            <div class="text">
-                <strong><?= __('Body') ?></strong>
-                <blockquote>
-                    <?= $this->Text->autoParagraph(h($emailSignature->body)); ?>
-                </blockquote>
-            </div>
-            <div class="related">
-                <h4><?= __('Related Scheduled Emails') ?></h4>
-                <?php if (!empty($emailSignature->scheduled_emails)) : ?>
-                <div class="table-responsive">
-                    <table>
-                        <tr>
-                            <th><?= __('Id') ?></th>
-                            <th><?= __('Email Template Id') ?></th>
-                            <th><?= __('Recipient Email') ?></th>
-                            <th><?= __('Subject') ?></th>
-                            <th><?= __('Body') ?></th>
-                            <th><?= __('Status') ?></th>
-                            <th><?= __('Scheduled Time') ?></th>
-                            <th><?= __('Sent Time') ?></th>
-                            <th><?= __('Created') ?></th>
-                            <th><?= __('Modified') ?></th>
-                            <th class="actions"><?= __('Actions') ?></th>
-                        </tr>
-                        <?php foreach ($emailSignature->scheduled_emails as $scheduledEmail) : ?>
-                        <tr>
-                            <td><?= h($scheduledEmail->id) ?></td>
-                            <td><?= h($scheduledEmail->email_template_id) ?></td>
-                            <td><?= h($scheduledEmail->recipient_email) ?></td>
-                            <td><?= h($scheduledEmail->subject) ?></td>
-                            <td><?= h($scheduledEmail->body) ?></td>
-                            <td><?= h($scheduledEmail->status) ?></td>
-                            <td><?= h($scheduledEmail->scheduled_time) ?></td>
-                            <td><?= h($scheduledEmail->sent_time) ?></td>
-                            <td><?= h($scheduledEmail->created) ?></td>
-                            <td><?= h($scheduledEmail->modified) ?></td>
-                            <td class="actions">
-                                <?= $this->Html->link(__('View'), ['controller' => 'ScheduledEmails', 'action' => 'view', $scheduledEmail->id]) ?>
-                                <?= $this->Html->link(__('Edit'), ['controller' => 'ScheduledEmails', 'action' => 'edit', $scheduledEmail->id]) ?>
-                                <?= $this->Form->postLink(
-                                    __('Delete'),
-                                    ['controller' => 'ScheduledEmails', 'action' => 'delete', $scheduledEmail->id],
-                                    [
-                                        'method' => 'delete',
-                                        'confirm' => __('Are you sure you want to delete # {0}?', $scheduledEmail->id),
-                                    ]
-                                ) ?>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </table>
-                </div>
-                <?php endif; ?>
-            </div>
-            <div class="related">
-                <h4><?= __('Related Sent Emails') ?></h4>
-                <?php if (!empty($emailSignature->sent_emails)) : ?>
-                <div class="table-responsive">
-                    <table>
-                        <tr>
-                            <th><?= __('Id') ?></th>
-                            <th><?= __('Email Template Id') ?></th>
-                            <th><?= __('Recipient Email') ?></th>
-                            <th><?= __('Subject') ?></th>
-                            <th><?= __('Body') ?></th>
-                            <th><?= __('Sent Time') ?></th>
-                            <th><?= __('Created') ?></th>
-                            <th><?= __('Modified') ?></th>
-                            <th class="actions"><?= __('Actions') ?></th>
-                        </tr>
-                        <?php foreach ($emailSignature->sent_emails as $sentEmail) : ?>
-                        <tr>
-                            <td><?= h($sentEmail->id) ?></td>
-                            <td><?= h($sentEmail->email_template_id) ?></td>
-                            <td><?= h($sentEmail->recipient_email) ?></td>
-                            <td><?= h($sentEmail->subject) ?></td>
-                            <td><?= h($sentEmail->body) ?></td>
-                            <td><?= h($sentEmail->sent_time) ?></td>
-                            <td><?= h($sentEmail->created) ?></td>
-                            <td><?= h($sentEmail->modified) ?></td>
-                            <td class="actions">
-                                <?= $this->Html->link(__('View'), ['controller' => 'SentEmails', 'action' => 'view', $sentEmail->id]) ?>
-                                <?= $this->Html->link(__('Edit'), ['controller' => 'SentEmails', 'action' => 'edit', $sentEmail->id]) ?>
-                                <?= $this->Form->postLink(
-                                    __('Delete'),
-                                    ['controller' => 'SentEmails', 'action' => 'delete', $sentEmail->id],
-                                    [
-                                        'method' => 'delete',
-                                        'confirm' => __('Are you sure you want to delete # {0}?', $sentEmail->id),
-                                    ]
-                                ) ?>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </table>
-                </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
+
+    </table>
+</div>
+<div class="text-end mt-4 pt-3" style="border-top:1px solid var(--border-color);">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 </div>

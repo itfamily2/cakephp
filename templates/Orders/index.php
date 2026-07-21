@@ -99,8 +99,8 @@
                     <td class="text-muted small"><?= $order->created ? date('M d, Y', strtotime($order->created)) : '-' ?></td>
                     <td class="text-end pe-4">
                         <div class="d-flex gap-1 justify-content-end">
-                            <?= $this->Html->link('<i class="fa-solid fa-eye"></i>', ['action' => 'view', $order->id], ['class' => 'btn btn-sm btn-outline-info', 'escape' => false]) ?>
-                            <?= $this->Html->link('<i class="fa-solid fa-pen"></i>', ['action' => 'edit', $order->id], ['class' => 'btn btn-sm btn-outline-primary', 'escape' => false]) ?>
+                            <?= $this->Html->link('<i class="fa-solid fa-eye"></i>', ['action' => 'view', $order->id], ['class' => 'btn btn-sm btn-outline-info ajax-modal-link', 'escape' => false]) ?>
+                            <?= $this->Html->link('<i class="fa-solid fa-pen"></i>', ['action' => 'edit', $order->id], ['class' => 'btn btn-sm btn-outline-primary ajax-modal-link', 'escape' => false]) ?>
                             <?= $this->Form->postLink('<i class="fa-solid fa-trash"></i>', ['action' => 'delete', $order->id], ['class' => 'btn btn-sm btn-outline-danger', 'escape' => false, 'confirm' => 'Delete order #' . h($order->order_number ?? $order->id) . '?']) ?>
                         </div>
                     </td>

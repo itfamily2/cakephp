@@ -35,8 +35,8 @@
                         <i class="fa-solid fa-ellipsis-v"></i>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
-                        <li><?= $this->Html->link('<i class="fa-solid fa-eye me-2"></i>View', ['action' => 'view', $role->id], ['class' => 'dropdown-item', 'escape' => false]) ?></li>
-                        <li><?= $this->Html->link('<i class="fa-solid fa-pen me-2"></i>Edit', ['action' => 'edit', $role->id], ['class' => 'dropdown-item', 'escape' => false]) ?></li>
+                        <li><?= $this->Html->link('<i class="fa-solid fa-eye me-2"></i>View', ['action' => 'view', $role->id], ['class' => 'dropdown-item ajax-modal-link', 'escape' => false]) ?></li>
+                        <li><?= $this->Html->link('<i class="fa-solid fa-pen me-2"></i>Edit', ['action' => 'edit', $role->id], ['class' => 'dropdown-item ajax-modal-link', 'escape' => false]) ?></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><?= $this->Form->postLink('<i class="fa-solid fa-trash me-2"></i>Delete', ['action' => 'delete', $role->id], ['class' => 'dropdown-item text-danger', 'escape' => false, 'confirm' => 'Delete role "' . h($role->name) . '"?']) ?></li>
                     </ul>

@@ -32,8 +32,8 @@
                         </td>
                         <td><?= h($group->created->format('Y-m-d H:i')) ?></td>
                         <td class="text-end">
-                            <a href="<?= $this->Url->build(['action' => 'view', $group->id]) ?>" class="btn btn-outline-info btn-sm me-1" title="View"><i class="fa-solid fa-eye"></i></a>
-                            <a href="<?= $this->Url->build(['action' => 'edit', $group->id]) ?>" class="btn btn-outline-primary btn-sm me-1" title="Edit"><i class="fa-solid fa-pencil"></i></a>
+                            <a href="<?= $this->Url->build(['action' => 'view', $group->id]) ?>" class="btn btn-outline-info btn-sm me-1 ajax-modal-link" title="View"><i class="fa-solid fa-eye"></i></a>
+                            <a href="<?= $this->Url->build(['action' => 'edit', $group->id]) ?>" class="btn btn-outline-primary btn-sm me-1 ajax-modal-link" title="Edit"><i class="fa-solid fa-pencil"></i></a>
                             <?= $this->Form->postLink(
                                 '<i class="fa-solid fa-trash"></i>',
                                 ['action' => 'delete', $group->id],

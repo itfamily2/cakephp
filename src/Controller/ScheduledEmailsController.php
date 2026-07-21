@@ -64,7 +64,15 @@ class ScheduledEmailsController extends AppController
         if ($this->request->is('post')) {
             $scheduledEmail = $this->ScheduledEmails->patchEntity($scheduledEmail, $this->request->getData());
             if ($this->ScheduledEmails->save($scheduledEmail)) {
-                $this->Notification->success(__('The scheduled email has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The scheduled email has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
@@ -89,7 +97,15 @@ class ScheduledEmailsController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $scheduledEmail = $this->ScheduledEmails->patchEntity($scheduledEmail, $this->request->getData());
             if ($this->ScheduledEmails->save($scheduledEmail)) {
-                $this->Notification->success(__('The scheduled email has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The scheduled email has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }

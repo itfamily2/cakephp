@@ -718,10 +718,21 @@ class UsersController extends AppController
 
                 $this->Activity->logActivity('Admin Edit User', 'Admin updated user configuration.');
                 $this->clearDashboardCache();
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('User updated successfully.')
+                    ]));
+                }
+
                 $this->Notification->success(__('User updated successfully.'));
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Notification->error(__('Unable to update user.'));
+            
+            if (!$this->request->is('ajax')) {
+                $this->Notification->error(__('Unable to update user.'));
+            }
         }
 
         $roles = TableRegistry::getTableLocator()->get('Roles')->find('list')->all();

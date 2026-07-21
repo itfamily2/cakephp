@@ -50,7 +50,7 @@
                     </td>
                     <td class="text-muted small"><?= !empty($email->sent_at) ? date('M d, Y H:i', strtotime($email->sent_at)) : '-' ?></td>
                     <td class="text-end pe-4">
-                        <?= $this->Html->link('<i class="fa-solid fa-eye"></i>', ['action' => 'view', $email->id], ['class' => 'btn btn-sm btn-outline-info', 'escape' => false]) ?>
+                        <?= $this->Html->link('<i class="fa-solid fa-eye"></i>', ['action' => 'view', $email->id], ['class' => 'btn btn-sm btn-outline-info ajax-modal-link', 'escape' => false]) ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>

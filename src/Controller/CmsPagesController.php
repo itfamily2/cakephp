@@ -102,7 +102,15 @@ class CmsPagesController extends AppController
         if ($this->request->is('post')) {
             $cmsPage = $this->CmsPages->patchEntity($cmsPage, $this->request->getData());
             if ($this->CmsPages->save($cmsPage)) {
-                $this->Notification->success(__('The cms page has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The cms page has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
@@ -125,7 +133,15 @@ class CmsPagesController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $cmsPage = $this->CmsPages->patchEntity($cmsPage, $this->request->getData());
             if ($this->CmsPages->save($cmsPage)) {
-                $this->Notification->success(__('The cms page has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The cms page has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }

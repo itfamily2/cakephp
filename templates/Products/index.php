@@ -4,7 +4,7 @@
         <h4 class="fw-bold mb-1"><i class="fa-solid fa-box text-warning me-2"></i>Products</h4>
         <p class="text-muted mb-0">Manage your product catalog and inventory.</p>
     </div>
-    <a href="<?= $this->Url->build(['action' => 'add']) ?>" class="btn btn-primary">
+    <a href="<?= $this->Url->build(['action' => 'add']) ?>" class="btn btn-primary ajax-modal-link" data-title="Add Product">
         <i class="fa-solid fa-plus me-2"></i>Add Product
     </a>
 </div>
@@ -68,8 +68,8 @@
                     </td>
                     <td class="text-end pe-4">
                         <div class="d-flex gap-1 justify-content-end">
-                            <?= $this->Html->link('<i class="fa-solid fa-eye"></i>', ['action' => 'view', $product->id], ['class' => 'btn btn-sm btn-outline-info', 'escape' => false]) ?>
-                            <?= $this->Html->link('<i class="fa-solid fa-pen"></i>', ['action' => 'edit', $product->id], ['class' => 'btn btn-sm btn-outline-primary', 'escape' => false]) ?>
+                            <?= $this->Html->link('<i class="fa-solid fa-eye"></i>', ['action' => 'view', $product->id], ['class' => 'btn btn-sm btn-outline-info ajax-modal-link', 'escape' => false, 'title' => 'View Product']) ?>
+                            <?= $this->Html->link('<i class="fa-solid fa-pen"></i>', ['action' => 'edit', $product->id], ['class' => 'btn btn-sm btn-outline-primary ajax-modal-link', 'escape' => false, 'title' => 'Edit Product']) ?>
                             <?= $this->Form->postLink('<i class="fa-solid fa-trash"></i>', ['action' => 'delete', $product->id], ['class' => 'btn btn-sm btn-outline-danger', 'escape' => false, 'confirm' => 'Delete "' . h($product->name) . '"?']) ?>
                         </div>
                     </td>

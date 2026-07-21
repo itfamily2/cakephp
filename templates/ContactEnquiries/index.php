@@ -63,8 +63,8 @@
                     <td class="text-muted small"><?= $enquiry->created ? date('M d, Y H:i', strtotime($enquiry->created)) : '-' ?></td>
                     <td class="text-end pe-4">
                         <div class="d-flex gap-1 justify-content-end">
-                            <?= $this->Html->link('<i class="fa-solid fa-eye"></i>', ['action' => 'view', $enquiry->id], ['class' => 'btn btn-sm btn-outline-info', 'escape' => false]) ?>
-                            <?= $this->Html->link('<i class="fa-solid fa-reply"></i>', ['action' => 'edit', $enquiry->id], ['class' => 'btn btn-sm btn-outline-primary', 'escape' => false, 'title' => 'Reply']) ?>
+                            <?= $this->Html->link('<i class="fa-solid fa-eye"></i>', ['action' => 'view', $enquiry->id], ['class' => 'btn btn-sm btn-outline-info ajax-modal-link', 'escape' => false]) ?>
+                            <?= $this->Html->link('<i class="fa-solid fa-reply"></i>', ['action' => 'edit', $enquiry->id], ['class' => 'btn btn-sm btn-outline-primary ajax-modal-link', 'escape' => false, 'title' => 'Reply']) ?>
                             <?= $this->Form->postLink('<i class="fa-solid fa-trash"></i>', ['action' => 'delete', $enquiry->id], ['class' => 'btn btn-sm btn-outline-danger', 'escape' => false, 'confirm' => 'Delete this enquiry?']) ?>
                         </div>
                     </td>

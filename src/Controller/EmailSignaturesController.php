@@ -64,7 +64,15 @@ class EmailSignaturesController extends AppController
         if ($this->request->is('post')) {
             $emailSignature = $this->EmailSignatures->patchEntity($emailSignature, $this->request->getData());
             if ($this->EmailSignatures->save($emailSignature)) {
-                $this->Notification->success(__('The email signature has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The email signature has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
@@ -88,7 +96,15 @@ class EmailSignaturesController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $emailSignature = $this->EmailSignatures->patchEntity($emailSignature, $this->request->getData());
             if ($this->EmailSignatures->save($emailSignature)) {
-                $this->Notification->success(__('The email signature has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The email signature has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }

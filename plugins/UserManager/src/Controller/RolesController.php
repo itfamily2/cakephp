@@ -82,7 +82,15 @@ class RolesController extends AppController
         if ($this->request->is('post')) {
             $role = $this->Roles->patchEntity($role, $this->request->getData());
             if ($this->Roles->save($role)) {
-                $this->Notification->success(__('The role has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The role has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
@@ -162,7 +170,15 @@ class RolesController extends AppController
                     }
                 }
 
-                $this->Notification->success(__('The role has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The role has been saved.'));
                 return $this->redirect(['action' => 'index']);
             }
             $this->Notification->error(__('The role could not be saved. Please, try again.'));

@@ -85,7 +85,15 @@ class ActivityLogsController extends AppController
         if ($this->request->is('post')) {
             $activityLog = $this->ActivityLogs->patchEntity($activityLog, $this->request->getData());
             if ($this->ActivityLogs->save($activityLog)) {
-                $this->Notification->success(__('The activity log has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The activity log has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
@@ -109,7 +117,15 @@ class ActivityLogsController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $activityLog = $this->ActivityLogs->patchEntity($activityLog, $this->request->getData());
             if ($this->ActivityLogs->save($activityLog)) {
-                $this->Notification->success(__('The activity log has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The activity log has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }

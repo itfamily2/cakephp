@@ -101,8 +101,8 @@
                     <td class="text-muted small"><?= $payment->created ? date('M d, Y', strtotime($payment->created)) : '-' ?></td>
                     <td class="text-end pe-4">
                         <div class="d-flex gap-1 justify-content-end">
-                            <?= $this->Html->link('<i class="fa-solid fa-eye"></i>', ['action' => 'view', $payment->id], ['class' => 'btn btn-sm btn-outline-info', 'escape' => false]) ?>
-                            <?= $this->Html->link('<i class="fa-solid fa-pen"></i>', ['action' => 'edit', $payment->id], ['class' => 'btn btn-sm btn-outline-primary', 'escape' => false]) ?>
+                            <?= $this->Html->link('<i class="fa-solid fa-eye"></i>', ['action' => 'view', $payment->id], ['class' => 'btn btn-sm btn-outline-info ajax-modal-link', 'escape' => false]) ?>
+                            <?= $this->Html->link('<i class="fa-solid fa-pen"></i>', ['action' => 'edit', $payment->id], ['class' => 'btn btn-sm btn-outline-primary ajax-modal-link', 'escape' => false]) ?>
                         </div>
                     </td>
                 </tr>

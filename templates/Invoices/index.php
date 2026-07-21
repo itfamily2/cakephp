@@ -71,8 +71,8 @@
                     </td>
                     <td class="text-end pe-4">
                         <div class="d-flex gap-1 justify-content-end">
-                            <?= $this->Html->link('<i class="fa-solid fa-eye"></i>', ['action' => 'view', $invoice->id], ['class' => 'btn btn-sm btn-outline-info', 'escape' => false, 'title' => 'View']) ?>
-                            <?= $this->Html->link('<i class="fa-solid fa-pen"></i>', ['action' => 'edit', $invoice->id], ['class' => 'btn btn-sm btn-outline-primary', 'escape' => false, 'title' => 'Edit']) ?>
+                            <?= $this->Html->link('<i class="fa-solid fa-eye"></i>', ['action' => 'view', $invoice->id], ['class' => 'btn btn-sm btn-outline-info ajax-modal-link', 'escape' => false, 'title' => 'View']) ?>
+                            <?= $this->Html->link('<i class="fa-solid fa-pen"></i>', ['action' => 'edit', $invoice->id], ['class' => 'btn btn-sm btn-outline-primary ajax-modal-link', 'escape' => false, 'title' => 'Edit']) ?>
                             <?= $this->Form->postLink('<i class="fa-solid fa-trash"></i>', ['action' => 'delete', $invoice->id], ['class' => 'btn btn-sm btn-outline-danger', 'escape' => false, 'confirm' => 'Delete this invoice?']) ?>
                         </div>
                     </td>

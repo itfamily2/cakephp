@@ -186,8 +186,7 @@ class ProductsTable extends Table
     public function findAvailable(SelectQuery $query, array $options): SelectQuery
     {
         return $query
-            ->where(['Products.stock >' => 0])
-            ->cache('products_available', 'default');
+            ->where(['Products.stock >' => 0]);
     }
 
     /**

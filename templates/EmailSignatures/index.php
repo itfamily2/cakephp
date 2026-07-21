@@ -39,8 +39,8 @@
                 </div>
             </div>
             <div class="d-flex gap-2">
-                <?= $this->Html->link('<i class="fa-solid fa-eye me-1"></i>Preview', ['action' => 'view', $sig->id], ['class' => 'btn btn-sm btn-outline-info flex-fill', 'escape' => false]) ?>
-                <?= $this->Html->link('<i class="fa-solid fa-pen me-1"></i>Edit', ['action' => 'edit', $sig->id], ['class' => 'btn btn-sm btn-outline-primary flex-fill', 'escape' => false]) ?>
+                <?= $this->Html->link('<i class="fa-solid fa-eye me-1"></i>Preview', ['action' => 'view', $sig->id], ['class' => 'btn btn-sm btn-outline-info flex-fill ajax-modal-link', 'escape' => false]) ?>
+                <?= $this->Html->link('<i class="fa-solid fa-pen me-1"></i>Edit', ['action' => 'edit', $sig->id], ['class' => 'btn btn-sm btn-outline-primary flex-fill ajax-modal-link', 'escape' => false]) ?>
                 <?= $this->Form->postLink('<i class="fa-solid fa-trash"></i>', ['action' => 'delete', $sig->id], ['class' => 'btn btn-sm btn-outline-danger', 'escape' => false, 'confirm' => 'Delete signature "' . h($sig->name) . '"?']) ?>
             </div>
         </div>

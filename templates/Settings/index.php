@@ -53,7 +53,7 @@ foreach ($settings as $setting) {
                     <td class="text-muted small"><?= h($setting->description ?? '—') ?></td>
                     <td class="text-end pe-4">
                         <div class="d-flex gap-1 justify-content-end">
-                            <?= $this->Html->link('<i class="fa-solid fa-pen"></i>', ['action' => 'edit', $setting->id], ['class' => 'btn btn-sm btn-outline-primary', 'escape' => false]) ?>
+                            <?= $this->Html->link('<i class="fa-solid fa-pen"></i>', ['action' => 'edit', $setting->id], ['class' => 'btn btn-sm btn-outline-primary ajax-modal-link', 'escape' => false]) ?>
                             <?= $this->Form->postLink('<i class="fa-solid fa-trash"></i>', ['action' => 'delete', $setting->id], ['class' => 'btn btn-sm btn-outline-danger', 'escape' => false, 'confirm' => 'Delete setting "' . h($setting->key) . '"?']) ?>
                         </div>
                     </td>

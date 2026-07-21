@@ -85,7 +85,15 @@ class ContactEnquiriesController extends AppController
         if ($this->request->is('post')) {
             $contactEnquiry = $this->ContactEnquiries->patchEntity($contactEnquiry, $this->request->getData());
             if ($this->ContactEnquiries->save($contactEnquiry)) {
-                $this->Notification->success(__('The contact enquiry has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The contact enquiry has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
@@ -109,7 +117,15 @@ class ContactEnquiriesController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $contactEnquiry = $this->ContactEnquiries->patchEntity($contactEnquiry, $this->request->getData());
             if ($this->ContactEnquiries->save($contactEnquiry)) {
-                $this->Notification->success(__('The contact enquiry has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The contact enquiry has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }

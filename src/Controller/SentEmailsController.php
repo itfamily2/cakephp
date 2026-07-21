@@ -64,7 +64,15 @@ class SentEmailsController extends AppController
         if ($this->request->is('post')) {
             $sentEmail = $this->SentEmails->patchEntity($sentEmail, $this->request->getData());
             if ($this->SentEmails->save($sentEmail)) {
-                $this->Notification->success(__('The sent email has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The sent email has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
@@ -89,7 +97,15 @@ class SentEmailsController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $sentEmail = $this->SentEmails->patchEntity($sentEmail, $this->request->getData());
             if ($this->SentEmails->save($sentEmail)) {
-                $this->Notification->success(__('The sent email has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The sent email has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }

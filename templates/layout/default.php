@@ -227,6 +227,69 @@ $currentUser = $currentUser ?? null;
                     $('#globalAjaxModalBody').html('<div class="alert alert-danger m-3">Failed to load content. Please try again.</div>');
                 });
             });
+
+            // Handle Form Submissions inside the Global AJAX Modal
+            $(document).on('submit', '#globalAjaxModal form', function(e) {
+                e.preventDefault();
+                var $form = $(this);
+                var url = $form.attr('action') || window.location.href;
+                var method = $form.attr('method') || 'POST';
+                var formData = new FormData(this);
+                var $btn = $form.find('button[type="submit"]');
+                var originalBtnText = $btn.html();
+                
+                $btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Saving...');
+                
+                $.ajax({
+                    url: url,
+                    type: method,
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    success: function(response) {
+                        // Check if JSON response (success) or HTML response (validation errors)
+                        if (typeof response === 'object' && response.success) {
+                            $('#globalAjaxModal').modal('hide');
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: response.message || 'Saved successfully.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                            
+                            // Refresh data
+                            if (typeof loadUsers === 'function' && typeof getFilterParams === 'function') {
+                                loadUsers(getFilterParams());
+                            } else {
+                                window.location.reload();
+                            }
+                        } else {
+                            // Replace modal body with form containing errors
+                            $('#globalAjaxModalBody').html(response);
+                        }
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 400 || xhr.status === 422) {
+                            $('#globalAjaxModalBody').html(xhr.responseText);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'An unexpected error occurred.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                            $btn.prop('disabled', false).html(originalBtnText);
+                        }
+                    }
+                });
+            });
         });
     </script>
     <?= $this->fetch('script') ?>

@@ -8,7 +8,7 @@ $this->assign('title', 'Groups Management');
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <h4 class="fw-bold text-white m-0"><i class="fa-solid fa-users-rectangle text-primary me-2"></i>User Groups</h4>
                 <div>
-                    <a href="<?= $this->Url->build(['action' => 'add']) ?>" class="btn btn-primary btn-sm">
+                    <a href="<?= $this->Url->build(['action' => 'add']) ?>" class="btn btn-primary btn-sm ajax-modal-link">
                         <i class="fa-solid fa-plus me-1"></i> Add Group
                     </a>
                 </div>

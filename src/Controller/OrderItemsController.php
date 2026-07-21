@@ -64,7 +64,15 @@ class OrderItemsController extends AppController
         if ($this->request->is('post')) {
             $orderItem = $this->OrderItems->patchEntity($orderItem, $this->request->getData());
             if ($this->OrderItems->save($orderItem)) {
-                $this->Notification->success(__('The order item has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The order item has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
@@ -89,7 +97,15 @@ class OrderItemsController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $orderItem = $this->OrderItems->patchEntity($orderItem, $this->request->getData());
             if ($this->OrderItems->save($orderItem)) {
-                $this->Notification->success(__('The order item has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The order item has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }

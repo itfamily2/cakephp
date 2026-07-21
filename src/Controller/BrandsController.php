@@ -63,7 +63,15 @@ class BrandsController extends AppController
         if ($this->request->is('post')) {
             $brand = $this->Brands->patchEntity($brand, $this->request->getData());
             if ($this->Brands->save($brand)) {
-                $this->Notification->success(__('The brand has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The brand has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
@@ -86,7 +94,15 @@ class BrandsController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $brand = $this->Brands->patchEntity($brand, $this->request->getData());
             if ($this->Brands->save($brand)) {
-                $this->Notification->success(__('The brand has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The brand has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }

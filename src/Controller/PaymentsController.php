@@ -64,7 +64,15 @@ class PaymentsController extends AppController
         if ($this->request->is('post')) {
             $payment = $this->Payments->patchEntity($payment, $this->request->getData());
             if ($this->Payments->save($payment)) {
-                $this->Notification->success(__('The payment has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The payment has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
@@ -88,7 +96,15 @@ class PaymentsController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $payment = $this->Payments->patchEntity($payment, $this->request->getData());
             if ($this->Payments->save($payment)) {
-                $this->Notification->success(__('The payment has been saved.'));
+                
+                if ($this->request->is('ajax')) {
+                    return $this->response->withType('application/json')->withStringBody(json_encode([
+                        'success' => true,
+                        'message' => __('Record saved successfully.')
+                    ]));
+                }
+
+$this->Notification->success(__('The payment has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }

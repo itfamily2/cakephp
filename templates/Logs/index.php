@@ -33,9 +33,9 @@
                 <i class="fa-solid fa-clock me-1"></i>Modified: <?= date('M d, Y H:i', $log['modified']) ?>
             </div>
             <div class="d-flex gap-2 flex-wrap">
-                <?= $this->Html->link('<i class="fa-solid fa-eye me-1"></i>View', ['action' => 'view', $log['name']], ['class' => 'btn btn-sm btn-outline-info flex-fill', 'escape' => false]) ?>
+                <?= $this->Html->link('<i class="fa-solid fa-eye me-1"></i>View', ['action' => 'view', $log['name']], ['class' => 'btn btn-sm btn-outline-info flex-fill ajax-modal-link', 'escape' => false]) ?>
                 <?= $this->Form->postLink('<i class="fa-solid fa-broom me-1"></i>Clear', ['action' => 'empty', $log['name']], ['class' => 'btn btn-sm btn-outline-warning flex-fill', 'escape' => false, 'confirm' => 'Clear all content from "' . h($log['name']) . '"?']) ?>
-                <?= $this->Form->postLink('<i class="fa-solid fa-floppy-disk me-1"></i>Backup', ['action' => 'backup', $log['name']], ['class' => 'btn btn-sm btn-outline-secondary', 'escape' => false]) ?>
+                <?= $this->Form->postLink('<i class="fa-solid fa-floppy-disk me-1"></i>Backup', ['action' => 'backup', $log['name']], ['class' => 'btn btn-sm btn-outline-secondary ajax-modal-link', 'escape' => false]) ?>
                 <?= $this->Form->postLink('<i class="fa-solid fa-trash"></i>', ['action' => 'delete', $log['name']], ['class' => 'btn btn-sm btn-outline-danger', 'escape' => false, 'confirm' => 'Permanently delete "' . h($log['name']) . '"?']) ?>
             </div>
         </div>
