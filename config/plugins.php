@@ -23,4 +23,5 @@ return [
     'Payments' => [],
     'CakePdf' => [],
     'Cake/Queue' => [],
+    'LoadTesting' => [],
 ];

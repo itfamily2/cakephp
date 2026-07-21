@@ -50,18 +50,13 @@
 </style>
 
 <div class="dashboard-container">
-    <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-2">
-        <div>
-            <h5 class="dashboard-header mb-0">Overview</h5>
-            <p class="text-micro mb-0">Welcome, <strong><?= h($currentUser->username ?? 'Admin') ?></strong> &middot; <?= date('M j, Y') ?></p>
-        </div>
-        <div class="d-flex gap-2">
-            <a href="<?= $this->Url->build(['controller' => 'Dashboard', 'action' => 'clearCache']) ?>" class="btn btn-sm btn-light border shadow-sm py-1" style="font-size: 0.75rem;">
-                <i class="fa-solid fa-rotate text-muted me-1"></i> Sync
-            </a>
-        </div>
-    </div>
+    <!-- Page Header (Injected into Top Navbar) -->
+    <?php
+    $this->assign('header_title', '<i class="fa-solid fa-gauge-high text-primary"></i> Dashboard');
+    
+    $headerActions = '<a href="' . $this->Url->build(['controller' => 'Dashboard', 'action' => 'clearCache']) . '" class="btn btn-sm btn-light border shadow-sm py-1 me-2" style="font-size: 0.75rem;"><i class="fa-solid fa-rotate text-muted me-1"></i> Sync</a>';
+    $this->assign('header_actions', $headerActions);
+    ?>
 
     <!-- KPI Stats Row -->
     <div class="row g-2 mb-3">

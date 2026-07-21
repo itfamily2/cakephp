@@ -43,7 +43,9 @@ $permIds = [];
 foreach ($modules as $mod) {
     foreach ($actions as $act) {
         $perm = $permissionsTable->newEmptyEntity();
-        $perm->name = strtolower($mod . '_' . $act);
+        $perm->plugin = null;
+        $perm->controller = $mod;
+        $perm->action = $act;
         $perm->description = "Can $act $mod";
         if ($saved = $permissionsTable->save($perm)) {
             $permIds[] = $saved->id;

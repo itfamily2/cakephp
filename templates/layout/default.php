@@ -124,6 +124,9 @@ $currentUser = $currentUser ?? null;
                 <a href="<?= $this->Url->build(['plugin' => 'API', 'controller' => 'Endpoints', 'action' => 'index']) ?>" class="sidebar-link <?= str_contains($this->request->getPath(), '/api/endpoints') ? 'active' : '' ?>">
                     <i class="fa-solid fa-server"></i> API Plugin
                 </a>
+                <a href="<?= $this->Url->build('/load-testing') ?>" class="sidebar-link <?= str_contains($this->request->getPath(), '/load-testing') ? 'active' : '' ?>">
+                    <i class="fa-solid fa-bolt"></i> Load Testing Plugin
+                </a>
 
                 <div class="sidebar-menu-title">System</div>
                 <a href="<?= $this->Url->build('/settings') ?>" class="sidebar-link <?= str_contains($this->request->getPath(), '/settings') ? 'active' : '' ?>">
@@ -149,10 +152,21 @@ $currentUser = $currentUser ?? null;
 
         <div class="main-wrapper">
             <nav class="top-navbar">
-                <div class="navbar-left">
-                    <span class="text-muted"><i class="fa-solid fa-calendar me-2"></i><?= date('D, M d, Y') ?></span>
+                <div class="navbar-left d-flex align-items-center gap-3">
+                    <?php if ($this->fetch('header_title')): ?>
+                        <h5 class="mb-0 fw-bold d-flex align-items-center gap-2" style="color: var(--text-main); font-size: 1rem;">
+                            <?= $this->fetch('header_title') ?>
+                        </h5>
+                    <?php else: ?>
+                        <span class="text-muted"><i class="fa-solid fa-calendar me-2"></i><?= date('D, M d, Y') ?></span>
+                    <?php endif; ?>
                 </div>
                 <div class="navbar-right d-flex align-items-center">
+                    <?php if ($this->fetch('header_actions')): ?>
+                        <div class="me-3 pe-3 border-end d-flex align-items-center gap-2">
+                            <?= $this->fetch('header_actions') ?>
+                        </div>
+                    <?php endif; ?>
                     <div class="dropdown">
                         <a class="dropdown-toggle text-decoration-none text-white d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
                             <?php if (!empty($currentUser->profile_image)): ?>
@@ -310,6 +324,59 @@ $currentUser = $currentUser ?? null;
                     }
                 });
             });
+
+            // Global AJAX Pagination across ALL Module Pages
+            $(document).on('click', '.pagination a', function(e) {
+                e.preventDefault();
+                var url = $(this).attr('href');
+                if (!url || url === '#' || url.indexOf('javascript') === 0) return;
+                
+                // Find the closest container to update (usually a card or the main content area)
+                var $container = $(this).closest('.card, .glass-card, .dashboard-container');
+                if ($container.length === 0) {
+                    $container = $('.main-content');
+                }
+                
+                // Add loading effect
+                $container.css('opacity', '0.5').css('pointer-events', 'none');
+                
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    success: function(response) {
+                        var $temp = $('<div>').html(response);
+                        
+                        // Extract the updated container from the response
+                        var $newContainer = $temp.find('.card, .glass-card, .dashboard-container').has('.pagination');
+                        if ($newContainer.length === 0) {
+                            $newContainer = $temp.find('.main-content');
+                        }
+                        
+                        if ($newContainer.length && $container.length) {
+                            $container.html($newContainer.html());
+                            // Update browser history
+                            window.history.pushState({path: url}, '', url);
+                        } else {
+                            // Fallback to normal navigation if parsing fails
+                            window.location.href = url;
+                        }
+                    },
+                    error: function() {
+                        window.location.href = url;
+                    },
+                    complete: function() {
+                        $container.css('opacity', '1').css('pointer-events', 'auto');
+                    }
+                });
+            });
+            
+            // Handle browser back/forward buttons after AJAX pagination
+            $(window).on('popstate', function(e) {
+                if (e.originalEvent.state && e.originalEvent.state.path) {
+                    window.location.reload(); // Simple fallback for back button
+                }
+            });
+
         });
     </script>
     <?= $this->fetch('script') ?>

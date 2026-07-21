@@ -1,13 +1,8 @@
 <?php $this->assign('title', 'Users'); ?>
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h4 class="fw-bold mb-1"><i class="fa-solid fa-users text-primary me-2"></i>User Management</h4>
-        <p class="text-muted mb-0">Manage system users, roles and access permissions.</p>
-    </div>
-    <a href="<?= $this->Url->build(['action' => 'add']) ?>" class="btn btn-primary">
-        <i class="fa-solid fa-user-plus me-2"></i>Add User
-    </a>
-</div>
+<?php 
+$this->assign('header_title', '<i class="fa-solid fa-users text-primary"></i> User Management'); 
+$this->assign('header_actions', '<a href="' . $this->Url->build(['action' => 'add']) . '" class="btn btn-primary btn-sm"><i class="fa-solid fa-user-plus me-1"></i>Add User</a>'); 
+?>
 
 <!-- Filter Bar -->
 <div class="glass-card p-3 mb-4">
