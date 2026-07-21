@@ -1,0 +1,211 @@
+{
+    "Users": [
+        {
+            "id": 1,
+            "username": "admin",
+            "email": "admin@example.com",
+            "password": "$2y$12$o6LTJDOYk\/kf3qvNq28u7.62lPS6xtQZ3Na2\/29RJKWSe89GkkcRW",
+            "profile_image": null,
+            "last_login_time": "2026-07-06T14:17:54+00:00",
+            "last_login_ip": "127.0.0.1",
+            "remember_token": null,
+            "is_active": true,
+            "email_verified": true,
+            "verification_token": null,
+            "password_reset_token": null,
+            "password_reset_expiry": null,
+            "created": "2026-07-06T12:21:55+00:00",
+            "modified": "2026-07-06T14:17:54+00:00"
+        },
+        {
+            "id": 2,
+            "username": "manager",
+            "email": "manager@example.com",
+            "password": "$2y$12$6.bnW0yDf4zFsNCqhrOXRO8o.ww2estDy5GI1yJbVVF3WRdHNGgx6",
+            "profile_image": null,
+            "last_login_time": null,
+            "last_login_ip": null,
+            "remember_token": null,
+            "is_active": true,
+            "email_verified": true,
+            "verification_token": null,
+            "password_reset_token": null,
+            "password_reset_expiry": null,
+            "created": "2026-07-06T12:21:55+00:00",
+            "modified": "2026-07-06T12:21:55+00:00"
+        },
+        {
+            "id": 3,
+            "username": "staff",
+            "email": "staff@example.com",
+            "password": "$2y$12$kQh4vWRX4yuqR.aJtYpSXeJLg9ztcMrOc8wD9kI6D5wStGY73g1LC",
+            "profile_image": null,
+            "last_login_time": null,
+            "last_login_ip": null,
+            "remember_token": null,
+            "is_active": true,
+            "email_verified": true,
+            "verification_token": null,
+            "password_reset_token": null,
+            "password_reset_expiry": null,
+            "created": "2026-07-06T12:21:56+00:00",
+            "modified": "2026-07-06T12:21:56+00:00"
+        }
+    ],
+    "Roles": [
+        {
+            "id": 1,
+            "name": "Administrator",
+            "description": "Full access to all modules",
+            "created": "2026-07-06T12:21:55+00:00",
+            "modified": "2026-07-06T12:21:55+00:00"
+        },
+        {
+            "id": 2,
+            "name": "Manager",
+            "description": "Manage users, CMS and view reports",
+            "created": "2026-07-06T12:21:55+00:00",
+            "modified": "2026-07-06T12:21:55+00:00"
+        },
+        {
+            "id": 3,
+            "name": "Staff",
+            "description": "Manage CMS and contact enquiries",
+            "created": "2026-07-06T12:21:55+00:00",
+            "modified": "2026-07-06T12:21:55+00:00"
+        }
+    ],
+    "Products": [
+        {
+            "id": 1,
+            "category_id": null,
+            "brand_id": null,
+            "name": "Bulk Product 1",
+            "slug": "bulk-1",
+            "sku": "BLK-01",
+            "price": "10.00",
+            "stock": 100,
+            "description": null,
+            "deleted_at": null,
+            "created": "2026-07-06T15:55:53+00:00",
+            "modified": null
+        },
+        {
+            "id": 2,
+            "category_id": null,
+            "brand_id": null,
+            "name": "Bulk Product 2",
+            "slug": "bulk-2",
+            "sku": "BLK-02",
+            "price": "20.00",
+            "stock": 200,
+            "description": null,
+            "deleted_at": null,
+            "created": "2026-07-06T15:55:53+00:00",
+            "modified": null
+        }
+    ],
+    "Orders": [
+        {
+            "id": 2,
+            "user_id": 1,
+            "order_number": "ORD-20260707-058E8D51",
+            "total": "10.00",
+            "status": "Draft",
+            "created": "2026-07-07T17:32:43+00:00",
+            "modified": "2026-07-07T17:32:43+00:00",
+            "notes": null,
+            "tax": "0.00",
+            "discount": "0.00",
+            "grand_total": "0.00",
+            "accepted_by": null,
+            "accepted_at": null,
+            "cancelled_by": null,
+            "cancelled_at": null
+        },
+        {
+            "id": 3,
+            "user_id": 1,
+            "order_number": "ORD-20260707-0DEB8683",
+            "total": "30.00",
+            "status": "Pending",
+            "created": "2026-07-07T17:59:10+00:00",
+            "modified": "2026-07-07T17:59:10+00:00",
+            "notes": null,
+            "tax": "0.00",
+            "discount": "0.00",
+            "grand_total": "0.00",
+            "accepted_by": null,
+            "accepted_at": null,
+            "cancelled_by": null,
+            "cancelled_at": null
+        }
+    ],
+    "OrderItems": [
+        {
+            "id": 1,
+            "order_id": 2,
+            "product_id": 1,
+            "quantity": 1,
+            "price": "10.00",
+            "created": "2026-07-07T17:32:43+00:00",
+            "modified": "2026-07-07T17:32:43+00:00",
+            "discount": "0.00",
+            "tax": "0.00",
+            "line_total": "0.00"
+        },
+        {
+            "id": 2,
+            "order_id": 3,
+            "product_id": 2,
+            "quantity": 1,
+            "price": "20.00",
+            "created": "2026-07-07T17:59:10+00:00",
+            "modified": "2026-07-07T17:59:10+00:00",
+            "discount": "0.00",
+            "tax": "0.00",
+            "line_total": "0.00"
+        },
+        {
+            "id": 3,
+            "order_id": 3,
+            "product_id": 1,
+            "quantity": 1,
+            "price": "10.00",
+            "created": "2026-07-07T17:59:10+00:00",
+            "modified": "2026-07-07T17:59:10+00:00",
+            "discount": "0.00",
+            "tax": "0.00",
+            "line_total": "0.00"
+        }
+    ],
+    "Settings": [
+        {
+            "id": 1,
+            "key": "site_name",
+            "value": "Enterprise User Management",
+            "input_type": "text",
+            "options": null,
+            "created": "2026-07-06T12:21:56+00:00",
+            "modified": "2026-07-06T12:21:56+00:00"
+        },
+        {
+            "id": 2,
+            "key": "timezone",
+            "value": "UTC",
+            "input_type": "text",
+            "options": null,
+            "created": "2026-07-06T12:21:56+00:00",
+            "modified": "2026-07-06T12:21:56+00:00"
+        },
+        {
+            "id": 3,
+            "key": "default_html_editor",
+            "value": "tinymce",
+            "input_type": "select",
+            "options": "tinymce,ckeditor,simple",
+            "created": "2026-07-06T12:21:56+00:00",
+            "modified": "2026-07-06T12:21:56+00:00"
+        }
+    ]
+}

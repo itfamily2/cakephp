@@ -183,9 +183,11 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             $authenticationService->loadAuthenticator('Authentication.Jwt', [
                 'secretKey' => \Cake\Utility\Security::getSalt(),
                 'algorithm' => 'HS256',
-                'returnPayload' => false
+                'returnPayload' => false,
+                'identifier' => [
+                    'className' => 'Authentication.JwtSubject',
+                ],
             ]);
-            $authenticationService->loadIdentifier('Authentication.JwtSubject');
         }
 
         $authenticationService->loadAuthenticator('Authentication.Session');

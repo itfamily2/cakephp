@@ -159,6 +159,25 @@ $currentUser = $currentUser ?? null;
             </div>
         </div>
 
+        <!-- Global AJAX Modal -->
+        <div class="modal fade" id="globalAjaxModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header bg-light">
+                        <h5 class="modal-title fw-bold" id="globalAjaxModalTitle"><i class="fa-solid fa-layer-group me-2 text-primary"></i> <span>Loading...</span></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4" id="globalAjaxModalBody">
+                        <div class="text-center p-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     <?php else: ?>
         <!-- Public/Login Layout -->
         <div class="container d-flex align-items-center justify-content-center min-vh-100">
@@ -189,6 +208,23 @@ $currentUser = $currentUser ?? null;
                     if (result.isConfirmed) {
                         window.location.href = '<?= $this->Url->build('/users/clear-cache') ?>';
                     }
+                });
+            });
+
+            // Global AJAX Modal Logic for Edit/View links
+            $(document).on('click', '.ajax-modal-link', function(e) {
+                e.preventDefault();
+                var url = $(this).attr('href');
+                var title = $(this).attr('title') || $(this).data('title') || 'Details';
+                
+                $('#globalAjaxModalTitle span').text(title);
+                $('#globalAjaxModalBody').html('<div class="text-center p-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+                $('#globalAjaxModal').modal('show');
+                
+                $.get(url, function(data) {
+                    $('#globalAjaxModalBody').html(data);
+                }).fail(function() {
+                    $('#globalAjaxModalBody').html('<div class="alert alert-danger m-3">Failed to load content. Please try again.</div>');
                 });
             });
         });

@@ -113,7 +113,7 @@ class InvoicesController extends AppController
         
         // Only show orders that can be invoiced
         $orders = $this->Invoices->Orders->find('list', limit: 200)
-            ->where(['status IN' => ['Accepted', 'Completed', 'Processing']])
+            ->where(['status NOT IN' => ['Draft', 'Cancelled', 'Rejected']])
             ->all();
             
         $this->set(compact('invoice', 'orders'));

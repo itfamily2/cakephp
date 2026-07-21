@@ -61,7 +61,8 @@ $this->assign('title', 'Edit Email Template');
                 'id' => 'editor',
                 'class' => 'form-control shadow-sm',
                 'label' => false,
-                'rows' => 15
+                'rows' => 15,
+                'required' => false
             ]) ?>
         </div>
 

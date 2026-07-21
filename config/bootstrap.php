@@ -247,3 +247,4 @@ ServerRequest::addDetector('tablet', function ($request) {
     'orientation' => 'portrait',
     'download' => false // false means display in browser, true means force download
 ]);
+require __DIR__ . '/queue_logger.php';

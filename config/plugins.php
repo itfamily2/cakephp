@@ -22,4 +22,5 @@ return [
     'API' => [],
     'Payments' => [],
     'CakePdf' => [],
+    'Cake/Queue' => [],
 ];

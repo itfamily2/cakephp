@@ -107,8 +107,8 @@
                         <td class="text-muted small"><?= $user->created ? $user->created->format('M d, Y') : '-' ?></td>
                         <td class="text-end pe-4">
                             <div class="d-flex gap-1 justify-content-end">
-                                <?= $this->Html->link('<i class="fa-solid fa-eye"></i>', ['action' => 'view', $user->id], ['class' => 'btn btn-sm btn-outline-primary', 'escape' => false, 'title' => 'View']) ?>
-                                <?= $this->Html->link('<i class="fa-solid fa-pen"></i>', ['action' => 'edit', $user->id], ['class' => 'btn btn-sm btn-outline-secondary', 'escape' => false, 'title' => 'Edit']) ?>
+                                <?= $this->Html->link('<i class="fa-solid fa-eye"></i>', ['action' => 'view', $user->id], ['class' => 'btn btn-sm btn-outline-primary ajax-modal-link', 'escape' => false, 'title' => 'View User']) ?>
+                                <?= $this->Html->link('<i class="fa-solid fa-pen"></i>', ['action' => 'edit', $user->id], ['class' => 'btn btn-sm btn-outline-secondary ajax-modal-link', 'escape' => false, 'title' => 'Edit User']) ?>
                                 <?= $this->Form->postLink('<i class="fa-solid fa-trash"></i>', ['action' => 'delete', $user->id], ['class' => 'btn btn-sm btn-outline-danger', 'escape' => false, 'confirm' => 'Delete user "' . h($user->username) . '"?', 'title' => 'Delete']) ?>
                             </div>
                         </td>

@@ -1,0 +1,430 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "CakePHP 5 ERP API",
+    "description": "Complete Live Swagger Sandbox — All Modules, All Endpoints",
+    "version": "1.0.0",
+    "contact": { "name": "ERP Admin" }
+  },
+  "servers": [
+    { "url": "http://localhost:8765/api/v1", "description": "Local Dev Server" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    },
+    "schemas": {
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string", "example": "Arnica Montana 30C" },
+          "sku": { "type": "string", "example": "HOM-ARM-30C" },
+          "price": { "type": "number", "format": "float", "example": 120.00 },
+          "stock": { "type": "integer", "example": 250 },
+          "is_active": { "type": "boolean", "example": true },
+          "category_id": { "type": "integer" },
+          "brand_id": { "type": "integer" },
+          "created": { "type": "string", "format": "date-time" },
+          "modified": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Brand": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string", "example": "SBL Homeopathy" },
+          "slug": { "type": "string", "example": "sbl-homeopathy" },
+          "description": { "type": "string" },
+          "is_active": { "type": "boolean" },
+          "created": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string", "example": "Mother Tinctures" },
+          "slug": { "type": "string", "example": "mother-tinctures" },
+          "description": { "type": "string" },
+          "parent_id": { "type": "integer", "nullable": true },
+          "is_active": { "type": "boolean" }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "order_number": { "type": "string", "example": "ORD-2026-0042" },
+          "user_id": { "type": "integer" },
+          "status": { "type": "string", "enum": ["Draft","Pending","Accepted","Processing","Completed","Cancelled","Rejected"] },
+          "total": { "type": "number", "format": "float" },
+          "notes": { "type": "string" },
+          "created": { "type": "string", "format": "date-time" }
+        }
+      },
+      "OrderItem": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "order_id": { "type": "integer" },
+          "product_id": { "type": "integer" },
+          "quantity": { "type": "integer", "example": 2 },
+          "price": { "type": "number", "format": "float", "example": 120.00 },
+          "discount": { "type": "number", "format": "float", "example": 0 },
+          "line_total": { "type": "number", "format": "float", "example": 240.00 }
+        }
+      },
+      "Invoice": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "invoice_number": { "type": "string", "example": "INV-2026-000001" },
+          "order_id": { "type": "integer" },
+          "total": { "type": "number", "format": "float" },
+          "status": { "type": "string", "enum": ["Draft","Sent","Paid","Cancelled"] },
+          "due_date": { "type": "string", "format": "date" },
+          "notes": { "type": "string" }
+        }
+      },
+      "Payment": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "order_id": { "type": "integer" },
+          "invoice_id": { "type": "integer" },
+          "amount": { "type": "number", "format": "float" },
+          "payment_method": { "type": "string", "enum": ["Cash","Card","UPI","Bank Transfer"] },
+          "status": { "type": "string", "enum": ["Pending","Completed","Failed","Refunded"] },
+          "transaction_id": { "type": "string" }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "username": { "type": "string", "example": "admin" },
+          "email": { "type": "string", "example": "admin@erp.local" },
+          "first_name": { "type": "string" },
+          "last_name": { "type": "string" },
+          "role_id": { "type": "integer" },
+          "active": { "type": "boolean" }
+        }
+      },
+      "EmailTemplate": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string", "example": "Welcome Email" },
+          "subject": { "type": "string" },
+          "body": { "type": "string" },
+          "type": { "type": "string" }
+        }
+      },
+      "Setting": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "key": { "type": "string", "example": "site_name" },
+          "value": { "type": "string", "example": "ERP System" },
+          "group": { "type": "string", "example": "general" }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string" },
+          "errors": { "type": "object" }
+        }
+      }
+    }
+  },
+  "security": [{ "bearerAuth": [] }],
+  "tags": [
+    { "name": "Auth", "description": "Authentication — Login, Register, Token" },
+    { "name": "Products", "description": "ERP Catalog — Products CRUD" },
+    { "name": "Brands", "description": "ERP Catalog — Brands CRUD" },
+    { "name": "Categories", "description": "ERP Catalog — Categories CRUD" },
+    { "name": "Orders", "description": "Order Management" },
+    { "name": "OrderItems", "description": "Order Line Items" },
+    { "name": "Invoices", "description": "Finance — Invoice Generation" },
+    { "name": "Payments", "description": "Finance — Payment Recording" },
+    { "name": "Users", "description": "User Management (Admin)" },
+    { "name": "EmailTemplates", "description": "Comms — Email Template Engine" },
+    { "name": "Settings", "description": "System Configuration" },
+    { "name": "Reports", "description": "Analytics & Reporting" }
+  ],
+  "paths": {
+    "/auth/login.json": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Login — Get JWT Token",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username","password"],
+                "properties": {
+                  "username": { "type": "string", "example": "admin" },
+                  "password": { "type": "string", "example": "password" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "JWT Token returned" },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/auth/register.json": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Register a new user",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string" },
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User created" },
+          "422": { "description": "Validation error" }
+        }
+      }
+    },
+    "/products.json": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "List all products (paginated)",
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of products",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Product" } }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Products"],
+        "summary": "Create a new product",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Product" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Product created" },
+          "422": { "$ref": "#/components/schemas/Error" }
+        }
+      }
+    },
+    "/products/{id}.json": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "Get a single product",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": {
+          "200": { "description": "Product entity", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Product" } } } },
+          "404": { "description": "Not found" }
+        }
+      },
+      "put": {
+        "tags": ["Products"],
+        "summary": "Update a product",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Product" } } }
+        },
+        "responses": { "200": { "description": "Updated" }, "422": { "description": "Validation error" } }
+      },
+      "delete": {
+        "tags": ["Products"],
+        "summary": "Delete a product",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Deleted" }, "404": { "description": "Not found" } }
+      }
+    },
+    "/products/autocomplete.json": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "Autocomplete product search (used by POS)",
+        "parameters": [{ "name": "term", "in": "query", "required": true, "schema": { "type": "string", "example": "Arnica" } }],
+        "responses": { "200": { "description": "Matching products list" } }
+      }
+    },
+    "/brands.json": {
+      "get": {
+        "tags": ["Brands"],
+        "summary": "List all brands",
+        "responses": { "200": { "description": "Array of brands", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Brand" } } } } }
+        }
+      },
+      "post": {
+        "tags": ["Brands"],
+        "summary": "Create a brand",
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Brand" } } } },
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/brands/{id}.json": {
+      "get": { "tags": ["Brands"], "summary": "Get a brand", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "Brand" } } },
+      "put": { "tags": ["Brands"], "summary": "Update a brand", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Brand" } } } }, "responses": { "200": { "description": "Updated" } } },
+      "delete": { "tags": ["Brands"], "summary": "Delete a brand", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "Deleted" } } }
+    },
+    "/categories.json": {
+      "get": { "tags": ["Categories"], "summary": "List all categories", "responses": { "200": { "description": "Array of categories", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Category" } } } } } } },
+      "post": { "tags": ["Categories"], "summary": "Create a category", "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Category" } } } }, "responses": { "201": { "description": "Created" } } }
+    },
+    "/categories/{id}.json": {
+      "get": { "tags": ["Categories"], "summary": "Get a category", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "Category" } } },
+      "put": { "tags": ["Categories"], "summary": "Update a category", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Category" } } } }, "responses": { "200": { "description": "Updated" } } },
+      "delete": { "tags": ["Categories"], "summary": "Delete a category", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "Deleted" } } }
+    },
+    "/orders.json": {
+      "get": {
+        "tags": ["Orders"],
+        "summary": "List all orders",
+        "parameters": [
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["Draft","Pending","Accepted","Processing","Completed","Cancelled"] } },
+          { "name": "page", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Orders list", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Order" } } } } } }
+      },
+      "post": {
+        "tags": ["Orders"],
+        "summary": "Create an order (POS checkout)",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": { "type": "integer" },
+                  "notes": { "type": "string" },
+                  "order_items": { "type": "array", "items": { "$ref": "#/components/schemas/OrderItem" } }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Order created with items" }, "422": { "description": "Validation error" } }
+      }
+    },
+    "/orders/{id}.json": {
+      "get": { "tags": ["Orders"], "summary": "Get order with items and invoice", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "Order" } } },
+      "put": { "tags": ["Orders"], "summary": "Update an order", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Order" } } } }, "responses": { "200": { "description": "Updated" } } },
+      "delete": { "tags": ["Orders"], "summary": "Delete an order", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "Deleted" } } }
+    },
+    "/orders/checkout.json": {
+      "post": {
+        "tags": ["Orders"],
+        "summary": "POS Checkout — save cart items and generate invoice",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": { "type": "integer" },
+                  "items": { "type": "array", "items": { "type": "object", "properties": { "product_id": { "type": "integer" }, "quantity": { "type": "integer" }, "price": { "type": "number" } } } }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Checkout success, invoice generated" } }
+      }
+    },
+    "/orders/{id}/order-items.json": {
+      "get": { "tags": ["OrderItems"], "summary": "List items for an order", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "Order items" } } },
+      "post": { "tags": ["OrderItems"], "summary": "Add item to order", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/OrderItem" } } } }, "responses": { "201": { "description": "Item added" } } }
+    },
+    "/invoices.json": {
+      "get": { "tags": ["Invoices"], "summary": "List all invoices", "parameters": [{ "name": "status", "in": "query", "schema": { "type": "string" } }], "responses": { "200": { "description": "Invoices list" } } },
+      "post": { "tags": ["Invoices"], "summary": "Generate invoice from an order", "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "order_id": { "type": "integer" }, "notes": { "type": "string" } } } } } }, "responses": { "201": { "description": "Invoice created" }, "422": { "description": "Order already invoiced or invalid status" } } }
+    },
+    "/invoices/{id}.json": {
+      "get": { "tags": ["Invoices"], "summary": "Get invoice with order details", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "Invoice" } } },
+      "put": { "tags": ["Invoices"], "summary": "Update invoice status", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Invoice" } } } }, "responses": { "200": { "description": "Updated" } } },
+      "delete": { "tags": ["Invoices"], "summary": "Delete invoice", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "Deleted" } } }
+    },
+    "/payments.json": {
+      "get": { "tags": ["Payments"], "summary": "List all payments", "responses": { "200": { "description": "Payments list" } } },
+      "post": { "tags": ["Payments"], "summary": "Record a payment against an invoice", "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Payment" } } } }, "responses": { "201": { "description": "Payment recorded" } } }
+    },
+    "/payments/{id}.json": {
+      "get": { "tags": ["Payments"], "summary": "Get a payment", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "Payment" } } },
+      "put": { "tags": ["Payments"], "summary": "Update a payment", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Payment" } } } }, "responses": { "200": { "description": "Updated" } } },
+      "delete": { "tags": ["Payments"], "summary": "Delete a payment", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "Deleted" } } }
+    },
+    "/users.json": {
+      "get": { "tags": ["Users"], "summary": "List all users (Admin)", "responses": { "200": { "description": "Users list" } } },
+      "post": { "tags": ["Users"], "summary": "Create a user (Admin)", "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } } }, "responses": { "201": { "description": "Created" } } }
+    },
+    "/users/{id}.json": {
+      "get": { "tags": ["Users"], "summary": "Get a user", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "User" } } },
+      "put": { "tags": ["Users"], "summary": "Update a user", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } } }, "responses": { "200": { "description": "Updated" } } },
+      "delete": { "tags": ["Users"], "summary": "Delete a user", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "Deleted" } } }
+    },
+    "/email-templates.json": {
+      "get": { "tags": ["EmailTemplates"], "summary": "List email templates", "responses": { "200": { "description": "Templates list" } } },
+      "post": { "tags": ["EmailTemplates"], "summary": "Create email template (with CKEditor body)", "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EmailTemplate" } } } }, "responses": { "201": { "description": "Created" } } }
+    },
+    "/email-templates/{id}.json": {
+      "get": { "tags": ["EmailTemplates"], "summary": "Get a template", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "Template" } } },
+      "put": { "tags": ["EmailTemplates"], "summary": "Update template", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EmailTemplate" } } } }, "responses": { "200": { "description": "Updated" } } },
+      "delete": { "tags": ["EmailTemplates"], "summary": "Delete template", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "Deleted" } } }
+    },
+    "/settings.json": {
+      "get": { "tags": ["Settings"], "summary": "List all system settings (key-value store)", "responses": { "200": { "description": "Settings list", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Setting" } } } } } } },
+      "post": { "tags": ["Settings"], "summary": "Create a new setting", "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Setting" } } } }, "responses": { "201": { "description": "Created" } } }
+    },
+    "/settings/{id}.json": {
+      "get": { "tags": ["Settings"], "summary": "Get a setting", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "Setting" } } },
+      "put": { "tags": ["Settings"], "summary": "Update a setting (cache auto-cleared on save)", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Setting" } } } }, "responses": { "200": { "description": "Updated" } } },
+      "delete": { "tags": ["Settings"], "summary": "Delete a setting", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }], "responses": { "200": { "description": "Deleted" } } }
+    },
+    "/reports/summary.json": {
+      "get": {
+        "tags": ["Reports"],
+        "summary": "Financial & Sales Summary Report",
+        "parameters": [
+          { "name": "from", "in": "query", "schema": { "type": "string", "format": "date", "example": "2026-01-01" } },
+          { "name": "to", "in": "query", "schema": { "type": "string", "format": "date", "example": "2026-12-31" } }
+        ],
+        "responses": { "200": { "description": "Aggregated financial summary" } }
+      }
+    },
+    "/reports/chart-data.json": {
+      "get": { "tags": ["Reports"], "summary": "Chart data for dashboard graphs (JSON)", "responses": { "200": { "description": "Chart datasets" } } }
+    },
+    "/reports/export-csv.csv": {
+      "get": { "tags": ["Reports"], "summary": "Export orders report as CSV", "responses": { "200": { "description": "CSV file download" } } }
+    }
+  }
+}

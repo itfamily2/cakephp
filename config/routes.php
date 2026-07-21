@@ -289,6 +289,7 @@ return function (RouteBuilder $routes): void {
         // =====================================================================
         // PRACTICAL ORM PHASE 6 ROUTES
         // =====================================================================
+        $builder->connect('/products/autocomplete',         ['controller' => 'Products', 'action' => 'autocomplete']);
         $builder->connect('/products/out-of-stock',         ['controller' => 'Products', 'action' => 'outOfStock']);
         $builder->connect('/products/bulk-price-increase',  ['controller' => 'Products', 'action' => 'bulkPriceIncrease']);
         
@@ -302,6 +303,7 @@ return function (RouteBuilder $routes): void {
      * to use (in this case, src/Template/Pages/home.ctp)...
      */
     $builder->connect('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
+    $builder->connect('/api-docs', ['controller' => 'ApiDocs', 'action' => 'index']);
 
     // =========================================================================
     // PHASE 14: Enable Data Extensions
@@ -315,11 +317,32 @@ return function (RouteBuilder $routes): void {
     // =========================================================================
     $builder->scope('/api/v1', ['prefix' => 'Api/V1'], function (\Cake\Routing\RouteBuilder $b) {
         $b->setExtensions(['json']);
+
+        // ── Core Catalog ──────────────────────────────────────
         $b->resources('Products');
-        $b->resources('Orders');
-        $b->connect('/users/token', ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'token']);
+        $b->resources('Brands');
+        $b->resources('Categories');
+
+        // ── Order Management ──────────────────────────────────
+        $b->resources('Orders', function (\Cake\Routing\RouteBuilder $r) {
+            $r->resources('OrderItems');
+        });
+
+        // ── Finance ───────────────────────────────────────────
+        $b->resources('Invoices');
+        $b->resources('Payments');
+
+        // ── System ────────────────────────────────────────────
+        $b->resources('Settings');
+
+        // ── Auth Endpoints ────────────────────────────────────
+        $b->connect('/auth/login',    ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'login'],    ['_name' => 'api-v1-login']);
+        $b->connect('/auth/register', ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'register'], ['_name' => 'api-v1-register']);
+        $b->connect('/auth/logout',   ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'logout'],   ['_name' => 'api-v1-logout']);
+
         $b->fallbacks();
     });
+
 
         $builder->connect('/login',    ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'login'],    ['_name' => 'login']);
         $builder->connect('/logout',   ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'logout'],   ['_name' => 'logout']);
@@ -462,11 +485,11 @@ return function (RouteBuilder $routes): void {
             });
             $builder->resources('Payments');
 
-            // Named API routes for auth endpoints
-            $builder->connect('/auth/login',    ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'login'],    ['_name' => 'api-v1-login']);
-            $builder->connect('/auth/register', ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'register'], ['_name' => 'api-v1-register']);
-            $builder->connect('/auth/logout',   ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'logout'],   ['_name' => 'api-v1-logout']);
-            $builder->connect('/auth/refresh',  ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'refreshToken'], ['_name' => 'api-v1-refresh']);
+            // Named API routes for auth endpoints (names deduplicated — canonical names in /api/v1 scope above)
+            $builder->connect('/auth/login',    ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'login']);
+            $builder->connect('/auth/register', ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'register']);
+            $builder->connect('/auth/logout',   ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'logout']);
+            $builder->connect('/auth/refresh',  ['plugin' => 'UserManager', 'controller' => 'Users', 'action' => 'refreshToken']);
 
             $builder->fallbacks(DashedRoute::class);
         });

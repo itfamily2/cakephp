@@ -24,6 +24,12 @@ $this->assign('title', 'Add Email Template');
 
 <div class="card shadow-sm border-0 mb-4">
     <div class="card-body p-5">
+        <?php if ($emailTemplate->getErrors()): ?>
+            <div class="alert alert-danger">
+                <strong>Validation Errors:</strong>
+                <pre><?= print_r($emailTemplate->getErrors(), true) ?></pre>
+            </div>
+        <?php endif; ?>
         <?= $this->Form->create($emailTemplate, ['class' => 'needs-validation']) ?>
         
         <div class="row g-4 mb-4">
@@ -52,7 +58,8 @@ $this->assign('title', 'Add Email Template');
                 'id' => 'editor',
                 'class' => 'form-control shadow-sm',
                 'label' => false,
-                'rows' => 15
+                'rows' => 15,
+                'required' => false
             ]) ?>
         </div>
 

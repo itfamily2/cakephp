@@ -133,6 +133,11 @@ class AppController extends Controller
 
         // Share timestamp for debugging
         $this->set('renderTimestamp', date('Y-m-d H:i:s'));
+
+        // Automatically disable layout for all AJAX requests to return raw view HTML for modals
+        if ($this->request->is('ajax')) {
+            $this->viewBuilder()->disableAutoLayout();
+        }
     }
 
     // =========================================================================

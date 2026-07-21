@@ -91,7 +91,7 @@ class DashboardController extends AppController
 
         $pendingEnquiries = \Cake\Cache\Cache::remember('dashboard_pending_enquiries', function () {
             return $this->fetchTable('ContactEnquiries')->find()
-                ->where(['ContactEnquiries.replied' => false])
+                ->where(['ContactEnquiries.reply_status IS' => null])
                 ->count();
         }, 'redis');
 
@@ -101,7 +101,7 @@ class DashboardController extends AppController
         $recentActivities = \Cake\Cache\Cache::remember('dashboard_recent_activities', function () {
             return $this->fetchTable('ActivityLogs')->find()
                 ->contain(['Users'])
-                ->order(['ActivityLogs.created' => 'DESC'])
+                ->orderBy(['ActivityLogs.created' => 'DESC'])
                 ->limit(5)
                 ->toArray();
         }, 'redis');
@@ -111,7 +111,7 @@ class DashboardController extends AppController
         // -------------------------------------------------------------------
         $recentUsers = \Cake\Cache\Cache::remember('dashboard_recent_users', function () {
             return $this->fetchTable('Users')->find()
-                ->order(['Users.created' => 'DESC'])
+                ->orderBy(['Users.created' => 'DESC'])
                 ->limit(5)
                 ->toArray();
         }, 'redis');
@@ -122,7 +122,7 @@ class DashboardController extends AppController
         $recentOrders = \Cake\Cache\Cache::remember('dashboard_recent_orders', function () {
             return $this->fetchTable('Orders')->find()
                 ->contain(['Users'])
-                ->order(['Orders.created' => 'DESC'])
+                ->orderBy(['Orders.created' => 'DESC'])
                 ->limit(5)
                 ->toArray();
         }, 'redis');
